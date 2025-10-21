@@ -60,11 +60,17 @@ def predict():
         if col == "class":
             continue
         value = request.form.get(col)
-        data[col] = float(value) if value.strip() else np.nan  # let imputer handle missing
+        # coerce to float if possible, empty or non-numeric -> np.nan for imputer
+        try:
+            data[col] = float(value) if value is not None and str(value).strip() != "" else np.nan
+        except ValueError:
+            data[col] = np.nan
 
     df = pd.DataFrame([data])
-    pred_class = pipe.predict(df)[0]
-    probs = pipe.predict_proba(df)[0]
+    # pass numpy array to pipeline to avoid feature-name mismatch warnings from SimpleImputer
+    arr = df.to_numpy()
+    pred_class = pipe.predict(arr)[0]
+    probs = pipe.predict_proba(arr)[0]
 
     classes = list(pipe.classes_)
     # ensure class keys are native Python types (not numpy types) so jsonify accepts them
