@@ -1,0 +1,243 @@
+/*
+ * DEEP GALAXY VIBE - SUBTLE, USABLE, FRIENDLY
+ *
+ * This section defines global styles and resets.
+ */
+* {
+    /* Box Model */
+    box-sizing: border-box;
+
+    /* Typography */
+    font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+}
+
+body {
+    /* Layout */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    min-height: 100vh;
+
+    /* Appearance */
+    background: radial-gradient(ellipse at 10% 10%, #0b0f1a 0%, #040305 60%);
+    color: #dfe9ff;
+}
+
+/*
+ * CARD LAYOUT AND STRUCTURE
+ *
+ * Styles for the main container and its internal components.
+ */
+.card {
+    /* Box Model */
+    width: 900px;
+    max-width: 94%;
+    padding: 36px;
+
+    /* Appearance */
+    background: linear-gradient(180deg, rgba(14, 12, 30, 0.6), rgba(3, 4, 12, 0.4));
+    border: 1px solid rgba(255, 255, 255, 0.03);
+    border-radius: 18px;
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.7);
+}
+
+header h1 {
+    /* Typography */
+    color: #d3c8ff;
+    font-size: 28px;
+    text-align: center;
+
+    /* Box Model */
+    margin: 0;
+}
+
+.subtitle {
+    /* Typography */
+    color: #bfc9ff;
+    opacity: 0.9;
+    text-align: center;
+
+    /* Box Model */
+    margin-top: 6px;
+}
+
+.grid {
+    /* Layout */
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+
+    /* Box Model */
+    margin-top: 20px;
+}
+
+.field {
+    /* Layout */
+    display: flex;
+    flex-direction: column;
+}
+
+.fname {
+    /* Typography */
+    color: #b6aee6;
+    font-size: 12px;
+
+    /* Box Model */
+    margin-bottom: 6px;
+}
+
+/*
+ * FORM ELEMENTS
+ *
+ * Styles for inputs and buttons.
+ */
+input[type=number] {
+    /* Appearance */
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    border-radius: 10px;
+    color: #fff;
+
+    /* Box Model */
+    padding: 10px 12px;
+}
+
+.actions {
+    /* Layout */
+    display: flex;
+    justify-content: center;
+
+    /* Box Model */
+    margin-top: 20px;
+}
+
+button {
+    /* Appearance */
+    background: linear-gradient(90deg, #6b47d6, #3fb0ff);
+    border: none;
+    box-shadow: 0 6px 18px rgba(63, 176, 255, 0.12);
+    color: white;
+    cursor: pointer;
+
+    /* Typography */
+    font-weight: 600;
+
+    /* Box Model */
+    border-radius: 12px;
+    padding: 12px 28px;
+}
+
+/*
+ * RESULT DISPLAY
+ *
+ * Styles for the output area, prediction text, and progress bars.
+ */
+.result {
+    /* Box Model */
+    margin-top: 24px;
+    padding-top: 16px;
+
+    /* Appearance */
+    border-top: 1px dashed rgba(255, 255, 255, 0.03);
+}
+
+.result.hidden {
+    display: none;
+}
+
+#pred-text {
+    /* Typography */
+    color: #ffd7ff;
+    font-weight: 700;
+    text-align: center;
+
+    /* Box Model */
+    margin: 8px 0;
+}
+
+.probs {
+    /* Box Model */
+    max-width: 720px;
+    margin: 8px auto;
+}
+
+.prob-row {
+    /* Layout */
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    /* Box Model */
+    margin: 10px 0;
+}
+
+.pname {
+    /* Typography */
+    color: #cfc1ff;
+    font-size: 13px;
+
+    /* Box Model */
+    width: 90px;
+}
+
+progress {
+    /* Appearance */
+    appearance: none;
+    overflow: hidden;
+
+    /* Box Model */
+    border-radius: 12px;
+    height: 16px;
+    width: 100%;
+}
+
+/* Progress Bar Customization */
+progress::-webkit-progress-bar {
+    background: rgba(255, 255, 255, 0.04);
+}
+
+progress::-webkit-progress-value {
+    background: linear-gradient(90deg, #b97bff, #5be0ff);
+}
+
+.pval {
+    /* Typography */
+    color: #d8d0ff;
+    font-size: 13px;
+    text-align: right;
+
+    /* Box Model */
+    width: 44px;
+}
+
+/*
+ * FOOTER AND MISCELLANEOUS
+ */
+.credits {
+    /* Typography */
+    color: #9d94b8;
+    font-size: 12px;
+    text-align: center;
+
+    /* Box Model */
+    margin-top: 14px;
+}
+
+code {
+    /* Appearance */
+    background: rgba(255, 255, 255, 0.02);
+
+    /* Box Model */
+    border-radius: 6px;
+    padding: 2px 6px;
+}
+
+/*
+ * MEDIA QUERIES
+ */
+@media (max-width: 720px) {
+    .grid {
+        grid-template-columns: repeat(1, 1fr);
+    }
+}

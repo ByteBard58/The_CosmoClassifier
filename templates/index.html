@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>CosmoClassifier</title>
+    <link rel="stylesheet" href="/static/style.css" />
+  </head>
+  <body>
+    <div class="card">
+      <header>
+        <h1>✨ CosmoClassifier</h1>
+        <p class="subtitle">Identify objects from SDSS — Galaxy • Star • QSO</p>
+      </header>
+
+      <form id="predict-form">
+        <div class="grid">
+          {% for f in features %}
+          <label class="field">
+            <span class="fname">{{ f }}</span>
+            <input name="{{ f }}" type="number" step="any" value="0" />
+          </label>
+          {% endfor %}
+        </div>
+
+        <div class="actions">
+          <button id="predict-btn" type="submit">🔭 Predict</button>
+        </div>
+      </form>
+
+      <section id="result" class="result hidden">
+        <h2 id="pred-text"></h2>
+        <div class="probs">
+          <div class="prob-row"><span class="pname">GALAXY</span><progress id="p-GALAXY" max="1" value="0"></progress><span class="pval" id="v-GALAXY">0%</span></div>
+          <div class="prob-row"><span class="pname">STAR</span><progress id="p-STAR" max="1" value="0"></progress><span class="pval" id="v-STAR">0%</span></div>
+          <div class="prob-row"><span class="pname">QSO</span><progress id="p-QSO" max="1" value="0"></progress><span class="pval" id="v-QSO">0%</span></div>
+        </div>
+      </section>
+
+      <footer class="credits">Built for research. Keep models in <code>/models</code>.</footer>
+    </div>
+
+    <script src="/static/script.js"></script>
+  </body>
+</html>
