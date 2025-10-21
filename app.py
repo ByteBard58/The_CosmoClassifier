@@ -67,9 +67,11 @@ def predict():
     probs = pipe.predict_proba(df)[0]
 
     classes = list(pipe.classes_)
+    # ensure class keys are native Python types (not numpy types) so jsonify accepts them
     response = {
         "prediction": str(pred_class),
-        "probabilities": {cls: round(float(prob), 3) for cls, prob in zip(classes, probs)}
+        "probabilities": {(int(cls) if isinstance(cls, (np.integer,)) else str(cls)): round(float(prob), 3)
+                          for cls, prob in zip(classes, probs)}
     }
     return jsonify(response)
 
