@@ -73,12 +73,14 @@ def predict():
     probs = pipe.predict_proba(arr)[0]
 
     classes = list(pipe.classes_)
-    # ensure class keys are native Python types (not numpy types) so jsonify accepts them
-    response = {
-        "prediction": str(pred_class),
-        "probabilities": {(int(cls) if isinstance(cls, (np.integer,)) else str(cls)): round(float(prob), 3)
-                          for cls, prob in zip(classes, probs)}
-    }
+    # map numeric classes to human-readable labels
+    label_map = {0: "GALAXY", 1: "STAR", 2: "QSO"}
+    # predicted class label
+    pred_label = label_map.get(int(pred_class), str(pred_class))
+    # probabilities mapped to label names
+    probs_by_label = {label_map.get(int(cls), str(cls)): round(float(prob), 3)
+                      for cls, prob in zip(classes, probs)}
+    response = {"prediction": pred_label, "probabilities": probs_by_label}
     return jsonify(response)
 
 
