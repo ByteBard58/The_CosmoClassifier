@@ -15,7 +15,7 @@
             {% if col != 'class' %}
                 <div class="input-group">
                     <label for="{{ col }}">{{ label }}</label>
-                    <input type="text" id="{{ col }}" name="{{ col }}" placeholder="">
+                    <input type="number" id="{{ col }}" name="{{ col }}" placeholder="" step="any" inputmode="decimal">
                 </div>
             {% endif %}
         {% endfor %}
