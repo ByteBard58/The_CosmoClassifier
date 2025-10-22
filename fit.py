@@ -9,6 +9,7 @@ import numpy as np
 import pandas as pd
 import os
 import joblib
+import time
 
 def data_collection(file_path = "Datasets/SDSS_DR18.csv"):
   # read the raw CSV into a DataFrame
@@ -73,8 +74,12 @@ def model(x,y,column_names):
     ("preprocessor",preprocessor),
     ("model",rf_model)
   ])
+  t1 = time.time()
   pipe.fit(x_train,y_train)
-
+  print("Model is trained successfully ✅")
+  t2 = time.time()
+  minutes, seconds = divmod((t2-t1),60)
+  print(f"Time taken for training: {minutes} Minute {seconds} Second")
   # evaluate on the held-out test set
   y_true = y_test
   y_pred = pipe.predict(x_test)
@@ -84,9 +89,13 @@ def model(x,y,column_names):
 
 def dumping(pipe,column_names):
   # ensure models directory exists and save artifacts
-  os.makedirs("models",exist_ok=True)
-  joblib.dump(pipe, "models/pipe.pkl")
-  joblib.dump(column_names, "models/column_names.pkl")
+  try:
+    os.makedirs("models",exist_ok=True)
+    joblib.dump(pipe, "models/pipe.pkl")
+    joblib.dump(column_names, "models/column_names.pkl")
+    print(f"Saved models/pipe.pkl and models/column_names.pkl successfully ✅")
+  except Exception as e:
+    print(f"Something went wrong while dumping. Message: {e}")
 
 def main():
   x,y,column_names = data_collection()
