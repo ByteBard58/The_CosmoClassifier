@@ -1,6 +1,6 @@
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
-from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA
+from sklearn.feature_selection import SequentialFeatureSelector
 from sklearn.preprocessing import StandardScaler
 from sklearn.impute import SimpleImputer
 from sklearn.metrics import classification_report
@@ -28,8 +28,22 @@ def data_collection(file_path = "Datasets/SDSS_DR18.csv"):
     "QSO":2
   })
 
+  # Feature Reduction
+  df_2 = df_1[["ra","dec","redshift","u","g","r","i","z","psfMag_r","class"]].copy()
+  
+  # Feature Engineering color contrast columns
+  df_2["u_g_color"] = df_2["u"] - df_2["g"]
+  df_2["g_r_color"] = df_2["g"] - df_2["r"]
+  df_2["r_i_color"] = df_2["r"] - df_2["i"]
+  df_2["i_z_color"] = df_2["i"] - df_2["z"]
+  df_2 = df_2.drop(columns=["u","g","r","i","z"])
+
+  # Moving the `class` column to the end
+  popped_class = df_2.pop("class")
+  df_2.insert(len(df_2.columns), "class", popped_class)
+
   # finalize DataFrame and split into features and target
-  df = df_1.copy()
+  df = df_2.copy()
   column_names = df.columns
   y = df.iloc[:,-1].to_numpy()    # Target Column
   x = df.iloc[:,:-1].to_numpy()     # Feature Column
@@ -45,14 +59,14 @@ def model(x,y,column_names):
   # Random forest for final classification
   rf_model = RandomForestClassifier(
     n_estimators=150,max_depth=10,random_state=104,class_weight="balanced",n_jobs=-1)
-  lda = LDA(n_components=2)    
-  # There are only 2 possible values for n_components since there are only 3 classes.  
-  # n_estimaors=2 gave the best score. So I kept it for the final version
+  sfs = SequentialFeatureSelector(
+    rf_model,n_features_to_select="auto",tol=0.007,direction="forward",cv=None)   
+  
   # preprocessing: impute, scale, then reduce dimensionality
   preprocessor = Pipeline([
     ("imputation",SimpleImputer(strategy="median")),
     ("scale", StandardScaler()),
-    ("lda",lda)
+    ("sfs",sfs)
   ])
   # full pipeline: preprocessing followed by the classifier
   pipe = Pipeline([
