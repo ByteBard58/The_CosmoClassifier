@@ -93,3 +93,21 @@ button:hover {
     height: 10px;
     background: linear-gradient(90deg, #33ccff, #9966ff);
 }
+
+footer {
+    text-align: center;
+    margin-top: 40px;
+    font-size: 0.9rem;
+    color: #9fa4c4;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: 15px;
+}
+
+footer a {
+    color: #c0aaff;
+    text-decoration: none;
+}
+
+footer a:hover {
+    text-decoration: underline;
+}
