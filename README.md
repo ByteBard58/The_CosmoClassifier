@@ -19,6 +19,12 @@ This project simplifies that complexity—transforming high-dimensional SDSS dat
 
 ---
 
+## 📸 Screenshots
+![Home Page](screenshots/ss_home.png)
+![Prediction](screenshots/ss_filled.png)
+
+---
+
 ## 📊 Dataset  
 
 - **Source:** [Sloan Digital Sky Survey DR18 – Kaggle Dataset](https://www.kaggle.com/datasets/diraf0/sloan-digital-sky-survey-dr18)  
@@ -131,12 +137,6 @@ Users can input **photometric parameters** such as:
 The app returns the predicted class with its confidence probabilities.
 
 **Note:** Due to the absence of front-end web development expertise and the lack of other contributors for the project, I had to resort to using AI tools (such as LLM services like ChatGPT™, Grok™, and GitHub Copilot™) to create a sophisticated front-end for the web app.
-
----
-
-## 📸 Screenshots
-![Home Page](screenshots/ss_home.png)
-![Prediction](screenshots/ss_filled.png)
 
 ---
 
