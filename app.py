@@ -2,12 +2,31 @@ from flask import Flask, render_template, request, jsonify
 import joblib
 import numpy as np
 import pandas as pd
+from fit import main
+import os
 
 app = Flask(__name__)
 
-# Load model + column names
-pipe = joblib.load("models/pipe.pkl")
-column_names = joblib.load("models/column_names.pkl")
+# Check for model and column names files, create them if they don't exist
+def load_or_create_models():
+    global pipe, column_names
+    model_path = "models/pipe.pkl"
+    columns_path = "models/column_names.pkl"
+    
+    # Create models directory if it doesn't exist
+    os.makedirs("models", exist_ok=True)
+    
+    # Check if both files exist
+    if not (os.path.exists(model_path) and os.path.exists(columns_path)):
+        print("Model or column names file not found. Running fit.py...")
+        main()  # Call the dumping method to create the .pkl files
+    
+    # Load model and column names
+    pipe = joblib.load(model_path)
+    column_names = joblib.load(columns_path)
+
+# Load or create models at startup
+load_or_create_models()
 
 # Human-readable labels for inputs
 feature_labels = {
@@ -21,12 +40,10 @@ feature_labels = {
     "i_z_color": "Infrared Magnitude - Far Infrared Magnitude"
 }
 
-
 @app.route("/")
 def home():
     readable_names = [feature_labels.get(col, col) for col in column_names if col != "class"]
-    return render_template("index.html", columns=column_names, labels=readable_names,zip=zip)
-
+    return render_template("index.html", columns=column_names, labels=readable_names, zip=zip)
 
 @app.route("/predict", methods=["POST"])
 def predict():
@@ -57,7 +74,6 @@ def predict():
                       for cls, prob in zip(classes, probs)}
     response = {"prediction": pred_label, "probabilities": probs_by_label}
     return jsonify(response)
-
 
 if __name__ == "__main__":
     app.run(debug=True)
