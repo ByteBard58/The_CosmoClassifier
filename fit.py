@@ -55,16 +55,11 @@ def data_collection(file_path = "Datasets/SDSS_DR18.csv") -> np.ndarray:
 
   # finalize DataFrame and split into features and target
   df = df_2.copy()
-  column_names = df.columns
+  column_names = df.columns.to_numpy()
   y = df.iloc[:,-1].to_numpy()    # Target Column
   x = df.iloc[:,:-1].to_numpy()     # Feature Column
   
-  return x,y
-
-def get_column_names(path="Datasets/SDSS_DR18.csv") -> np.ndarray:
-  df = pd.read_csv(path)
-  column_names = df.columns.to_numpy()
-  return column_names
+  return x,y,column_names
 
 def model(x,y) -> BaseEstimator:
   # split data, keeping class balance in train/test
@@ -74,7 +69,6 @@ def model(x,y) -> BaseEstimator:
 
   # RF, SVC, LR, XGB
   rf_model = RandomForestClassifier(random_state=40)
-  svc_model = SVC(random_state=41)
   lr_model = LogisticRegression(random_state=42,max_iter=10_000)
   xgb_model = XGBClassifier(random_state=43)
 
@@ -144,8 +138,7 @@ def dumping(pipe,column_names):
     print(f"Something went wrong while dumping. Message: {e}")
 
 def main():
-  x,y = data_collection()
-  column_names = get_column_names()
+  x,y,column_names = data_collection()
   estimator = model(x,y)
   dumping(estimator,column_names)
 
