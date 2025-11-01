@@ -1,17 +1,27 @@
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.model_selection import train_test_split
-from sklearn.feature_selection import SequentialFeatureSelector
+from sklearn.ensemble import RandomForestClassifier,VotingClassifier
+from sklearn.svm import SVC
+from sklearn.linear_model import LogisticRegression
+from sklearn.base import BaseEstimator
+from xgboost import XGBClassifier
+
+from sklearn.decomposition import PCA
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA
+
+from sklearn.model_selection import train_test_split,learning_curve,RandomizedSearchCV
 from sklearn.preprocessing import StandardScaler
 from sklearn.impute import SimpleImputer
 from sklearn.metrics import classification_report
-from sklearn.pipeline import Pipeline
+
+from imblearn.over_sampling import SMOTE
+from imblearn.pipeline import Pipeline
+
+import time
+import os
 import numpy as np
 import pandas as pd
-import os
 import joblib
-import time
 
-def data_collection(file_path = "Datasets/SDSS_DR18.csv"):
+def data_collection(file_path = "Datasets/SDSS_DR18.csv") -> np.ndarray:
   # read the raw CSV into a DataFrame
   df_raw = pd.read_csv(file_path)
 
@@ -49,58 +59,95 @@ def data_collection(file_path = "Datasets/SDSS_DR18.csv"):
   y = df.iloc[:,-1].to_numpy()    # Target Column
   x = df.iloc[:,:-1].to_numpy()     # Feature Column
   
-  return x,y,column_names
+  return x,y
 
-def model(x,y,column_names):
+def get_column_names(path="Datasets/SDSS_DR18.csv") -> np.ndarray:
+  df = pd.read_csv(path)
+  column_names = df.columns.to_numpy()
+  return column_names
+
+def model(x,y) -> BaseEstimator:
   # split data, keeping class balance in train/test
   x_train,x_test,y_train,y_test = train_test_split(
     x,y,test_size=2/10,random_state=120,shuffle=True,stratify=y
   )
 
-  # Random forest for final classification
-  rf_model = RandomForestClassifier(
-    n_estimators=150,max_depth=10,random_state=104,class_weight="balanced",n_jobs=-1)
-  sfs = SequentialFeatureSelector(
-    rf_model,n_features_to_select="auto",tol=0.007,direction="forward",cv=None)   
-  
-  # preprocessing: impute, scale, then reduce dimensionality
-  preprocessor = Pipeline([
-    ("imputation",SimpleImputer(strategy="median")),
-    ("scale", StandardScaler()),
-    ("sfs",sfs)
-  ])
-  # full pipeline: preprocessing followed by the classifier
+  # RF, SVC, LR, XGB
+  rf_model = RandomForestClassifier(random_state=40)
+  svc_model = SVC(random_state=41)
+  lr_model = LogisticRegression(random_state=42,max_iter=10_000)
+  xgb_model = XGBClassifier(random_state=43)
+
+  pca = PCA(random_state=44)
+  lda = LDA(n_components=2)
+
   pipe = Pipeline([
-    ("preprocessor",preprocessor),
+    ("impute",SimpleImputer(strategy="median")),
+    ("scale",StandardScaler()),
+    ("smote",SMOTE(random_state=101)),
+    ("dimen",pca),
     ("model",rf_model)
   ])
+  param_list = [
+    { # Random Forest, PCA On
+      "model": [rf_model],"model__n_estimators":np.arange(150,650,100),
+      "model__max_depth":np.arange(7,14,2), "dimen" : [pca], "dimen__n_components": np.arange(5,8,1)
+    },
+    { # Logistic Regression, No dimen. reduction, l1 penalty, `saga` solver
+      "model": [lr_model], "model__C": [0.01,0.1,1,10], "model__penalty":["l1"], "model__solver":["saga"],
+      "dimen": ["passthrough"]
+    },
+    { # Logistic Regression, No dimen. reduction, l2 penalty, `lbfgs` solver
+      "model": [lr_model], "model__C": [0.01,0.1,1,10], "model__penalty":["l2"], "model__solver":["lbfgs"],
+      "dimen": ["passthrough"]
+    },
+    { # XGBoost, PCA On
+      "dimen": [pca], "dimen__n_components": np.arange(5,8,1),
+      "model": [xgb_model], "model__n_estimators" : np.linspace(500,1100,3,dtype=int),"model__learning_rate": [0.01,0.1], "model__max_depth":np.arange(7,14,3)
+    },
+    { # XGBoost, LDA On
+      "dimen": [lda],
+      "model": [xgb_model], "model__n_estimators" : [500,700,900],"model__learning_rate": [0.01,0.1], "model__max_depth":np.arange(7,14,3)
+    },
+    { # XGBoost, No dimen. reduction
+      "dimen": ["passthrough"],
+      "model": [xgb_model], "model__n_estimators" : [500,700,900],"model__learning_rate": [0.01,0.1], "model__max_depth":np.arange(7,14,3)
+    }
+  ]
+
+  rscv = RandomizedSearchCV(
+    estimator=pipe,param_distributions=param_list,n_iter=8,cv=5,n_jobs=-1,random_state=50,refit=True
+  )
+
+  print(f"🤖 Starting Model Training....")
+  print(f"‼️ Training may take a lot of time, so please sit tight....")
   t1 = time.time()
-  pipe.fit(x_train,y_train)
-  print("Model is trained successfully ✅")
+  rscv.fit(x_train,y_train)
   t2 = time.time()
-  minutes, seconds = divmod((t2-t1),60)
-  print(f"Time taken for training: {minutes} Minute {seconds} Second")
-  # evaluate on the held-out test set
+  minutes,seconds = np.divmod((t2-t1),60)
+  print(f"⌛️ Time Elapsed: {minutes} Minutes {seconds:2f} Seconds")
+  estimator = rscv.best_estimator_
   y_true = y_test
-  y_pred = pipe.predict(x_test)
+  y_pred = estimator.predict(x_test)
   print(classification_report(y_true,y_pred))
 
-  return pipe,column_names
+  return estimator
 
 def dumping(pipe,column_names):
   # ensure models directory exists and save artifacts
   try:
     os.makedirs("models",exist_ok=True)
-    joblib.dump(pipe, "models/pipe.pkl")
+    joblib.dump(pipe, "models/estimator.pkl")
     joblib.dump(column_names, "models/column_names.pkl")
     print(f"Saved models/pipe.pkl and models/column_names.pkl successfully ✅")
   except Exception as e:
     print(f"Something went wrong while dumping. Message: {e}")
 
 def main():
-  x,y,column_names = data_collection()
-  pipe,clmn_names = model(x,y,column_names)
-  dumping(pipe,clmn_names)
+  x,y = data_collection()
+  column_names = get_column_names()
+  estimator = model(x,y)
+  dumping(estimator,column_names)
 
 if __name__ == "__main__":
   main()
