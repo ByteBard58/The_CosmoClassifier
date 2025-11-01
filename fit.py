@@ -125,7 +125,7 @@ def model(x,y) -> BaseEstimator:
   rscv.fit(x_train,y_train)
   t2 = time.time()
   minutes,seconds = np.divmod((t2-t1),60)
-  print(f"⌛️ Time Elapsed: {minutes} Minutes {seconds:2f} Seconds")
+  print(f"⌛️ Time Elapsed: {minutes} Minutes {seconds:.2f} Seconds")
   estimator = rscv.best_estimator_
   y_true = y_test
   y_pred = estimator.predict(x_test)
