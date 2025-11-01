@@ -20,10 +20,16 @@ def load_or_create_models():
     if not (os.path.exists(model_path) and os.path.exists(columns_path)):
         print("Model or column names file not found. Running fit.py...")
         main()  # Call the dumping method to create the .pkl files
+    else:
+        print("All artifacts are found! Loading them now....")
     
     # Load model and column names
-    pipe = joblib.load(model_path)
-    column_names = joblib.load(columns_path)
+    try:
+        pipe = joblib.load(model_path)
+        column_names = joblib.load(columns_path)
+        print(f"Artifacts are loaded successfully! Ready for prediction....")
+    except Exception as e:
+        print(f"Artifacts could not be loaded ! Error: {e}")
 
 # Load or create models at startup
 load_or_create_models()
