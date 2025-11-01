@@ -60,17 +60,19 @@ models/
 
 ## 🧪 Model Selection Research  
 
-Multiple combinations of models and dimensionality-reduction methods were tested before finalizing the architecture:  
+Previously, multiple combinations of models and dimensionality-reduction methods were tested before finalizing the architecture. This was a manual process which is now replaced by scikit-learn's RandomizedSearchCV algorithm, which allows us to find the best classifier and hyperparameter setting.
 
-| Dimensionality Reduction / Model ↓ → | Random Forest | Support Vector Classifier | Logistic Regression |
-| :----------------------------------- | :-------------: | :-----------------------: | :-----------------: |
-| **Principal Component Analysis (PCA)** | 0.9803 | 0.9471 | 0.9725 |
-| **Linear Discriminant Analysis (LDA)** | 0.9846 | 0.9832 | 0.9832 |
-| **Sequential Feature Selection (SFS)** | **0.9870** | — | — |
+ Here is the **Classification Report** which was calculated after fitting the best model discovered by RandomizedSearchCV:
+ | Class            | Precision | Recall | F1-Score | Support |
+|-----------------|-----------|--------|----------|---------|
+| 0 (GALAXY)              | 0.99      | 0.99   | 0.99     | 10469   |
+| 1 (STAR)              | 0.99      | 1.00   | 0.99     | 7446    |
+| 2 (QSO)              | 0.97      | 0.96   | 0.97     | 2085    |
+| **Accuracy**    | -         | -      | 0.99     | 20000   |
+| **Macro Avg**   | 0.98      | 0.98   | 0.98     | 20000   |
+| **Weighted Avg**| 0.99      | 0.99   | 0.99     | 20000   |
 
-✅ **Chosen Model:** Random Forest + SFS (Accuracy ≈ 98.7 %)  
-
-You can find the code for other algorithms in the `notebooks` folder of the repository. 
+You can find the code for this in [research.ipynb](https://github.com/ByteBard58/The_CosmoClassifier/blob/main/research.ipynb) file included in the repo. Note that this result is for the full dataset with all original features.
 
 ---
 
