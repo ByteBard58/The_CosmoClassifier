@@ -10,7 +10,7 @@ app = Flask(__name__)
 # Check for model and column names files, create them if they don't exist
 def load_or_create_models():
     global pipe, column_names
-    model_path = "models/pipe.pkl"
+    model_path = "models/estimator.pkl"
     columns_path = "models/column_names.pkl"
     
     # Create models directory if it doesn't exist
