@@ -5,3 +5,7 @@ joblib
 gunicorn
 flask
 notebook
+matplotlib
+seaborn
+imbalanced-learn
+xgboost
