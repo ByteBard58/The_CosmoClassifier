@@ -27,7 +27,7 @@ def load_or_create_models():
     try:
         pipe = joblib.load(model_path)
         column_names = joblib.load(columns_path)
-        print(f"Artifacts are loaded successfully! Ready for prediction....")
+        print("Artifacts are loaded successfully! Ready for prediction....")
     except Exception as e:
         print(f"Artifacts could not be loaded ! Error: {e}")
 
