@@ -1,88 +1,55 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The CosmoClassifier 🌌</title>
+    
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
-    <meta charset="UTF-8">
-    <title>The CosmoClassifier 🌌</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
+
 <div class="container">
-    <h1>The CosmoClassifier 🪐</h1>
-    <p class="subtitle">Classify celestial objects (Galaxy, Star, Quasar) using SDSS data</p>
+    <header>
+        <h1>The CosmoClassifier 🪐</h1>
+        <p class="subtitle">Predict Celestial Objects using SDSS Spectroscopic Data</p>
+    </header>
 
     <form id="predictForm">
-        {% for col, label in zip(columns, labels) %}
-            {% if col != 'class' %}
+        <div class="input-grid">
+            {% for col, label in zip(columns, labels) %}
+                {% if col != 'class' %}
                 <div class="input-group">
+                    <input type="number" id="{{ col }}" name="{{ col }}" placeholder=" " step="any" required>
                     <label for="{{ col }}">{{ label }}</label>
-                    <input type="number" id="{{ col }}" name="{{ col }}" placeholder="" step="any" inputmode="decimal">
                 </div>
-            {% endif %}
-        {% endfor %}
-        <button type="submit">Predict</button>
+                {% endif %}
+            {% endfor %}
+        </div>
+        <button type="submit" id="predictBtn">
+            <span>Analyze Data</span>
+        </button>
     </form>
 
     <div id="result" class="hidden">
-        <h2>Prediction Result</h2>
-        <p id="predClass"></p>
+        <div id="predClass"></div>
         <div id="probabilities"></div>
     </div>
 
     <footer>
         <p>
-            Check the official GitHub repo for this web app
-            <a href="https://github.com/ByteBard58/The_CosmoClassifier" target="_blank">here</a>.<br>
-            The CosmoClassifier is licensed under the <strong>MIT License</strong>.<br>
-            &copy; 2025 <strong>Sakib Hossain</strong>. All rights reserved.
+            Powered by Scikit-Learn • 
+            <a href="https://github.com/ByteBard58/The_CosmoClassifier" target="_blank">View on GitHub</a>
         </p>
+        <p>&copy; 2025 ByteBard58. MIT License.</p>
     </footer>
 </div>
 
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-    const form = document.getElementById("predictForm");
-    const inputs = Array.from(form.querySelectorAll("input"));
-    const resultDiv = document.getElementById("result");
-    const predClass = document.getElementById("predClass");
-    const probsDiv = document.getElementById("probabilities");
-
-    // Move to next field on Enter
-    inputs.forEach((input, index) => {
-        input.addEventListener("keydown", (event) => {
-            if (event.key === "Enter") {
-                event.preventDefault();
-                const next = inputs[index + 1];
-                if (next) next.focus();
-                else form.querySelector("button[type=submit]").focus();
-            }
-        });
-    });
-
-    form.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        const formData = new FormData(form);
-        const response = await fetch("/predict", { method: "POST", body: formData });
-        const data = await response.json();
-
-        predClass.innerHTML = `<b>Predicted Class:</b> ${data.prediction}`;
-        probsDiv.innerHTML = "";
-        for (const [cls, prob] of Object.entries(data.probabilities)) {
-            probsDiv.innerHTML += `
-                <div class="prob-row">
-                    <span>${cls}</span>
-                    <div class="bar">
-                        <div class="fill" style="width: ${prob * 100}%"></div>
-                    </div>
-                    <span>${(prob * 100).toFixed(2)}%</span>
-                </div>`;
-        }
-
-        resultDiv.classList.remove("hidden");
-    });
-});
-</script>
+<script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
