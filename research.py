@@ -1,6 +1,6 @@
 import marimo
 
-__generated_with = "0.17.8"
+__generated_with = "0.18.4"
 app = marimo.App()
 
 
@@ -239,18 +239,7 @@ def _(mo):
 
 
 @app.cell
-def _(
-    RandomizedSearchCV,
-    lda,
-    lr_model,
-    np,
-    pca,
-    pipe,
-    rf_model,
-    x_train,
-    xgb_model,
-    y_train,
-):
+def _(lda, lr_model, np, pca, rf_model, xgb_model):
     param_list = [
       { # Random Forest, PCA On
         "model": [rf_model],"model__n_estimators":np.arange(150,650,100),
@@ -279,7 +268,11 @@ def _(
         "model": [xgb_model], "model__n_estimators" : [500,700,900],"model__learning_rate": [0.01,0.1], "model__max_depth":np.arange(7,14,3)
       }
     ]
+    return (param_list,)
 
+
+@app.cell
+def _(RandomizedSearchCV, param_list, pipe, x_train, y_train):
     rscv = RandomizedSearchCV(
       estimator=pipe,param_distributions=param_list,n_iter=8,cv=5,n_jobs=-1,random_state=50,refit=True
     )
