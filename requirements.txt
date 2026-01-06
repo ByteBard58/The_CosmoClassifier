@@ -9,3 +9,4 @@ matplotlib
 seaborn
 imbalanced-learn
 xgboost
+python-dotenv

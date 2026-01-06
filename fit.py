@@ -19,8 +19,13 @@ import os
 import numpy as np
 import pandas as pd
 import joblib
+from dotenv import load_dotenv
 
-def data_collection(file_path = "Datasets/SDSS_DR18.csv") -> np.ndarray:
+load_dotenv()
+# Use environment variable if available, otherwise fallback to default local path
+file_path = os.getenv("PATH_DS", "Datasets/SDSS_DR18.csv")
+
+def data_collection(file_path = file_path) -> np.ndarray:
   # read the raw CSV into a DataFrame
   df_raw = pd.read_csv(file_path)
 
@@ -112,8 +117,8 @@ def model(x,y) -> BaseEstimator:
     estimator=pipe,param_distributions=param_list,n_iter=8,cv=5,n_jobs=-1,random_state=50,refit=True
   )
 
-  print(f"🤖 Starting Model Training....")
-  print(f"‼️ Training may take a lot of time, so please sit tight....")
+  print("🤖 Starting Model Training....")
+  print("‼️ Training may take a lot of time, so please sit tight....")
   t1 = time.time()
   rscv.fit(x_train,y_train)
   t2 = time.time()
@@ -132,7 +137,7 @@ def dumping(pipe,column_names):
     os.makedirs("models",exist_ok=True)
     joblib.dump(pipe, "models/estimator.pkl")
     joblib.dump(column_names, "models/column_names.pkl")
-    print(f"Saved models/pipe.pkl and models/column_names.pkl successfully ✅")
+    print("Saved models/pipe.pkl and models/column_names.pkl successfully ✅")
   except Exception as e:
     print(f"Something went wrong while dumping. Message: {e}")
 
