@@ -58,12 +58,67 @@ def plotting(x,y) -> None:
   y_true = y_test
   y_pred = model.predict(x_test)
   cm = confusion_matrix(y_true,y_pred)
-  plt.figure(figsize=(10, 7))
-  sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=labels, yticklabels=labels)
-  plt.xlabel('Predicted')
-  plt.ylabel('True')
-  plt.title('Confusion Matrix')
-  plt.savefig("static/confusion_matrix.png")
+  
+  # Set the style to match the professional theme
+  plt.style.use('dark_background')
+  
+  # Create figure with custom sizing
+  fig, ax = plt.subplots(figsize=(10, 8))
+  fig.patch.set_facecolor('#12121c')
+  ax.set_facecolor('#12121c')
+  
+  # Custom colormap matching the theme (purple to cyan gradient)
+  colors = ['#1a1a2e', '#2d1b4e', '#3d2075', '#4c2a96', '#5c35a8', 
+            '#6b40ba', '#7a4bcc', '#8956de', '#9861f0', '#7000ff']
+  cmap = sns.color_palette(colors, as_cmap=True)
+  
+  # Create heatmap with theme colors
+  sns.heatmap(
+    cm, 
+    annot=True, 
+    fmt='d', 
+    cmap='Blues',
+    xticklabels=labels, 
+    yticklabels=labels,
+    ax=ax,
+    annot_kws={
+      'fontsize': 16,
+      'fontweight': 'bold',
+      'color': '#ffffff'
+    },
+    cbar_kws={
+      'label': 'Count',
+      'shrink': 0.8
+    },
+    linewidths=2,
+    linecolor='rgba(255,255,255,0.1)',
+    square=True
+  )
+  
+  # Customize labels
+  ax.set_xlabel('Predicted Classification', fontsize=14, fontweight='bold', color='#8b8b9e', labelpad=10)
+  ax.set_ylabel('True Classification', fontsize=14, fontweight='bold', color='#8b8b9e', labelpad=10)
+  ax.set_title('CosmoClassifier - Confusion Matrix\nSDSS DR18 Test Set Performance', 
+               fontsize=16, fontweight='bold', color='#ffffff', pad=20)
+  
+  # Style the tick labels
+  ax.tick_params(axis='both', colors='#8b8b9e', labelsize=12)
+  
+  # Add subtle grid
+  for spine in ax.spines.values():
+    spine.set_color('rgba(255,255,255,0.1)')
+    spine.set_linewidth(1)
+  
+  # Style colorbar
+  cbar = ax.collections[0].colorbar
+  cbar.ax.tick_params(colors='#8b8b9e')
+  cbar.set_label('Count', color='#8b8b9e', fontsize=12)
+  
+  # Adjust layout
+  plt.tight_layout()
+  
+  # Save with theme colors
+  plt.savefig("static/confusion_matrix.png", dpi=150, facecolor='#12121c', edgecolor='none', bbox_inches='tight')
   plt.close()
   print("Saved and closed confusion matrix ✅")
 
@@ -73,4 +128,3 @@ def main() -> None:
 
 if __name__ == "__main__":
   main()
-

@@ -3,52 +3,291 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The CosmoClassifier 🌌</title>
+    <title>CosmoClassifier | Celestial Object Classification</title>
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
 
-<div class="container">
-    <header>
-        <h1>The CosmoClassifier 🪐</h1>
-        <p class="subtitle">Predict Celestial Objects using SDSS Spectroscopic Data</p>
-    </header>
-
-    <form id="predictForm">
-        <div class="input-grid">
-            {% for col, label in zip(columns, labels) %}
-                {% if col != 'class' %}
-                <div class="input-group">
-                    <input type="number" id="{{ col }}" name="{{ col }}" placeholder=" " step="any" required>
-                    <label for="{{ col }}">{{ label }}</label>
-                </div>
-                {% endif %}
-            {% endfor %}
-        </div>
-        <button type="submit" id="predictBtn">
-            <span>Analyze Data</span>
-        </button>
-    </form>
-
-    <div id="result" class="hidden">
-        <div id="predClass"></div>
-        <div id="probabilities"></div>
-    </div>
-
-    <footer>
-        <p>
-            Powered by Scikit-Learn • 
-            <a href="https://github.com/ByteBard58/The_CosmoClassifier" target="_blank">View on GitHub</a>
-        </p>
-        <p>&copy; 2026 ByteBard58. MIT License.</p>
-    </footer>
+<!-- Animated Background -->
+<div class="bg-animation">
+    <div class="stars"></div>
+    <div class="twinkling"></div>
+    <div class="nebula nebula-1"></div>
+    <div class="nebula nebula-2"></div>
 </div>
+
+<!-- Header Navigation -->
+<header class="main-header">
+    <div class="header-content">
+        <div class="logo">
+            <div class="logo-icon">
+                <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="20" cy="20" r="18" stroke="url(#gradient)" stroke-width="2"/>
+                    <circle cx="20" cy="20" r="8" fill="url(#gradient)"/>
+                    <path d="M20 4 L20 12" stroke="url(#gradient)" stroke-width="2"/>
+                    <path d="M20 28 L20 36" stroke="url(#gradient)" stroke-width="2"/>
+                    <path d="M4 20 L12 20" stroke="url(#gradient)" stroke-width="2"/>
+                    <path d="M28 20 L36 20" stroke="url(#gradient)" stroke-width="2"/>
+                    <defs>
+                        <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#00d4ff"/>
+                            <stop offset="100%" stop-color="#7000ff"/>
+                        </linearGradient>
+                    </defs>
+                </svg>
+            </div>
+            <div class="logo-text">
+                <span class="logo-name">CosmoClassifier</span>
+                <span class="logo-tagline">SDSS Spectroscopic Analysis</span>
+            </div>
+        </div>
+        
+        <nav class="main-nav">
+            <button class="nav-btn active" data-tab="predict">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <path d="M12 6v6l4 2"/>
+                </svg>
+                Predict
+            </button>
+            <button class="nav-btn" data-tab="model">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                    <path d="M2 17l10 5 10-5"/>
+                    <path d="M2 12l10 5 10-5"/>
+                </svg>
+                Model Info
+            </button>
+            <button class="nav-btn" data-tab="confusion">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="18" height="18" rx="2"/>
+                    <path d="M3 9h18"/>
+                    <path d="M9 21V9"/>
+                </svg>
+                Confusion Matrix
+            </button>
+        </nav>
+    </div>
+</header>
+
+<!-- Main Content -->
+<main class="main-content">
+    
+    <!-- Prediction Tab -->
+    <section class="tab-content active" id="predict-tab">
+        <div class="container">
+            <div class="section-header">
+                <h1 class="section-title">Classify Celestial Objects</h1>
+                <p class="section-subtitle">Enter spectroscopic parameters from SDSS DR18 to classify objects as Galaxy, Star, or Quasar</p>
+            </div>
+
+            <form id="predictForm" class="predict-form">
+                <div class="input-grid">
+                    {% for col, label in zip(columns, labels) %}
+                        {% if col != 'class' %}
+                        <div class="input-group">
+                            <input type="number" id="{{ col }}" name="{{ col }}" placeholder=" " step="any" required>
+                            <label for="{{ col }}">{{ label }}</label>
+                            <div class="input-focus-line"></div>
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                
+                <div class="form-actions">
+                    <button type="submit" id="predictBtn" class="btn-primary">
+                        <span class="btn-text">Analyze Spectrum</span>
+                        <span class="btn-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M5 12h14M12 5l7 7-7 7"/>
+                            </svg>
+                        </span>
+                        <div class="btn-glow"></div>
+                    </button>
+                </div>
+            </form>
+
+            <!-- Results Section -->
+            <div id="result" class="result-section hidden">
+                <div class="result-header">
+                    <div class="result-badge">
+                        <span class="badge-label">Classification Result</span>
+                    </div>
+                </div>
+                
+                <div class="result-content">
+                    <div class="pred-main">
+                        <span class="pred-label">Detected:</span>
+                        <span class="pred-class" id="predClass"></span>
+                    </div>
+                    
+                    <div class="probability-section">
+                        <h3 class="prob-title">Confidence Distribution</h3>
+                        <div id="probabilities" class="prob-list"></div>
+                    </div>
+                </div>
+                
+                <div class="result-decoration">
+                    <div class="decoration-line"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Model Info Tab -->
+    <section class="tab-content" id="model-tab">
+        <div class="container container-wide">
+            <div class="section-header centered">
+                <h1 class="section-title">Model Architecture</h1>
+                <p class="section-subtitle">Understanding the classification pipeline</p>
+            </div>
+            
+            <div class="model-cards">
+                <div class="model-card">
+                    <div class="card-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="18" height="18" rx="2"/>
+                            <path d="M3 9h18"/>
+                            <path d="M9 21V9"/>
+                        </svg>
+                    </div>
+                    <h3>Random Forest Classifier</h3>
+                    <p>Ensemble of 100 decision trees with max depth of 20, using Gini impurity for splitting</p>
+                </div>
+                
+                <div class="model-card">
+                    <div class="card-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="3"/>
+                            <path d="M12 1v6m0 6v10"/>
+                            <path d="m4.22 4.22 4.24 4.24m7.08 7.08 4.24 4.24"/>
+                            <path d="M1 12h6m6 0h10"/>
+                            <path d="m4.22 19.78 4.24-4.24m7.08-7.08 4.24-4.24"/>
+                        </svg>
+                    </div>
+                    <h3>12 Input Features</h3>
+                    <p>Right Ascension, Declination, Redshift, PSF Magnitude, and 8 derived color indices (u-g, g-r, r-i, i-z)</p>
+                </div>
+                
+                <div class="model-card">
+                    <div class="card-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                            <polyline points="22 4 12 14.01 9 11.01"/>
+                        </svg>
+                    </div>
+                    <h3>3 Class Labels</h3>
+                    <p>Galaxy, Star, Quasar (QSO) - Classified using SDSS spectroscopic data with high accuracy</p>
+                </div>
+                
+                <div class="model-card">
+                    <div class="card-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+                        </svg>
+                    </div>
+                    <h3>~250K Training Samples</h3>
+                    <p>Model trained on SDSS DR18 dataset with 80/20 train-test split and stratified sampling</p>
+                </div>
+            </div>
+            
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <span class="stat-value">97.8%</span>
+                    <span class="stat-label">Accuracy</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value">0.99</span>
+                    <span class="stat-label">Macro F1-Score</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value">100K+</span>
+                    <span class="stat-label">Test Samples</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Confusion Matrix Tab -->
+    <section class="tab-content" id="confusion-tab">
+        <div class="container container-wide">
+            <div class="section-header centered">
+                <h1 class="section-title">Model Performance</h1>
+                <p class="section-subtitle">Confusion matrix visualization on test set</p>
+            </div>
+            
+            <div class="confusion-container">
+                <div class="confusion-wrapper">
+                    <img src="{{ url_for('static', filename='confusion_matrix.png') }}" alt="Confusion Matrix" class="confusion-image" id="confusionImage">
+                </div>
+                
+                <div class="confusion-legend">
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: linear-gradient(135deg, #7000ff, #00d4ff)"></div>
+                        <div class="legend-text">
+                            <strong>Correct Predictions</strong>
+                            <span>True positives along diagonal</span>
+                        </div>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: rgba(255, 100, 100, 0.5)"></div>
+                        <div class="legend-text">
+                            <strong>Misclassifications</strong>
+                            <span>Off-diagonal errors</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="class-labels">
+                <div class="class-label-item">
+                    <div class="class-badge galaxy">GALAXY</div>
+                    <span>Extragalactic objects</span>
+                </div>
+                <div class="class-label-item">
+                    <div class="class-badge star">STAR</div>
+                    <span>Stellar objects</span>
+                </div>
+                <div class="class-label-item">
+                    <div class="class-badge qso">QSO</div>
+                    <span>Quasi-stellar objects</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+</main>
+
+<!-- Footer -->
+<footer class="main-footer">
+    <div class="footer-content">
+        <div class="footer-brand">
+            <span>CosmoClassifier</span>
+            <span class="footer-divider">•</span>
+            <span>Powered by Scikit-Learn</span>
+        </div>
+        <div class="footer-links">
+            <a href="https://github.com/ByteBard58/The_CosmoClassifier" target="_blank" class="footer-link">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                </svg>
+                GitHub
+            </a>
+        </div>
+        <div class="footer-copyright">
+            &copy; 2026 ByteBard58 • MIT License
+        </div>
+    </div>
+</footer>
+
+<!-- Toast Notification Container -->
+<div id="toast-container" class="toast-container"></div>
 
 <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
