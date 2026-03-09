@@ -122,8 +122,6 @@ def plotting(x,y) -> None:
   # Customize labels
   ax.set_xlabel('Predicted Classification', fontsize=14, fontweight='bold', color=TEXT_SECONDARY, labelpad=15)
   ax.set_ylabel('True Classification', fontsize=14, fontweight='bold', color=TEXT_SECONDARY, labelpad=15)
-  ax.set_title('CosmoClassifier - Confusion Matrix\nSDSS DR18 Test Set Performance', 
-               fontsize=18, fontweight='bold', color=TEXT_PRIMARY, pad=25)
   
   # Style the tick labels with class-specific colors
   ax.tick_params(axis='x', colors=TEXT_SECONDARY, labelsize=12, rotation=0)
