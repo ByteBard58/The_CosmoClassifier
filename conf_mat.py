@@ -64,7 +64,7 @@ def plotting(x,y) -> None:
   plt.style.use('dark_background')
   
   # Theme colors matching the frontend CSS
-  BG_COLOR = '#0a0a12'        # --bg-secondary from CSS
+  BG_COLOR = '#12121c'        # --bg-tertiary from CSS (card background)
   CARD_BG = '#12121c'         # --bg-tertiary from CSS
   ACCENT_PURPLE = '#7000ff'   # --accent-primary from CSS
   ACCENT_CYAN = '#00d4ff'     # --accent-secondary from CSS
