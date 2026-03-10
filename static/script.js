@@ -45,6 +45,7 @@ function initTabNavigation() {
 function initPredictForm() {
     const form = document.getElementById("predictForm");
     const resultDiv = document.getElementById("result");
+    const awaitingDiv = document.getElementById("awaiting-prediction");
     const predClassDiv = document.getElementById("predClass");
     const probsDiv = document.getElementById("probabilities");
     const submitBtn = document.getElementById("predictBtn");
@@ -54,7 +55,11 @@ function initPredictForm() {
         
         // Set loading state
         setLoadingState(submitBtn, true);
+        
+        // Hide awaiting state, show result
+        awaitingDiv.style.display = 'none';
         resultDiv.classList.add("hidden");
+        document.getElementById('result-stats').classList.add('hidden');
         
         try {
             const formData = new FormData(form);
@@ -72,7 +77,12 @@ function initPredictForm() {
             
             // Show results with animation
             resultDiv.classList.remove("hidden");
-            resultDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            document.getElementById('result-stats').classList.remove('hidden');
+            
+            // Scroll to result if on mobile
+            if (window.innerWidth < 900) {
+                resultDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
             
             // Show success toast
             showToast('Classification complete!', 'success');
@@ -80,6 +90,10 @@ function initPredictForm() {
         } catch (error) {
             console.error(error);
             showToast('Error: Could not connect to the prediction service.', 'error');
+            // Show awaiting state again on error
+            awaitingDiv.style.display = 'flex';
+            resultDiv.classList.add("hidden");
+            document.getElementById('result-stats').classList.add('hidden');
         } finally {
             setLoadingState(submitBtn, false);
         }
@@ -115,11 +129,8 @@ function renderPredictionResult(data, predClassDiv, probsDiv) {
     const pred = data.prediction;
     const probs = data.probabilities;
     
-    // Determine class type for styling
-    const classType = pred.toLowerCase();
-    
     // Set prediction class with styling
-    predClassDiv.innerHTML = `<span class="pred-class" data-type="${classType}">${pred}</span>`;
+    predClassDiv.innerHTML = `<span class="pred-class" data-type="${pred.toLowerCase()}">${pred}</span>`;
     
     // Render probability bars
     probsDiv.innerHTML = "";
@@ -161,16 +172,15 @@ function initKeyboardShortcuts() {
                 case '2':
                     document.querySelector('[data-tab="model"]').click();
                     break;
-                case '3':
-                    document.querySelector('[data-tab="confusion"]').click();
-                    break;
             }
         }
         
         // Escape to clear results
         if (e.key === 'Escape') {
             const resultDiv = document.getElementById("result");
+            const awaitingDiv = document.getElementById("awaiting-prediction");
             resultDiv.classList.add("hidden");
+            awaitingDiv.style.display = 'flex';
         }
     });
 }
