@@ -98,6 +98,27 @@ function initPredictForm() {
             setLoadingState(submitBtn, false);
         }
     });
+
+    // Clear Form Handler
+    const clearBtn = document.getElementById("clearBtn");
+    clearBtn.addEventListener("click", () => {
+        clearForm();
+    });
+
+    function clearForm() {
+        form.reset();
+        
+        // Reset UI states
+        resultDiv.classList.add("hidden");
+        document.getElementById('result-stats').classList.add('hidden');
+        awaitingDiv.style.display = 'flex';
+        
+        // Show success toast
+        showToast('Form cleared', 'info');
+    }
+
+    // Export clearForm for use in keyboard shortcuts
+    window.clearForm = clearForm;
 }
 
 /**
@@ -175,12 +196,9 @@ function initKeyboardShortcuts() {
             }
         }
         
-        // Escape to clear results
+        // Escape to clear form
         if (e.key === 'Escape') {
-            const resultDiv = document.getElementById("result");
-            const awaitingDiv = document.getElementById("awaiting-prediction");
-            resultDiv.classList.add("hidden");
-            awaitingDiv.style.display = 'flex';
+            if (window.clearForm) window.clearForm();
         }
     });
 }

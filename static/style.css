@@ -441,18 +441,16 @@ input:focus ~ .input-focus-line {
 
 .form-actions {
     margin-top: var(--space-md);
+    display: flex;
+    gap: 0.8rem;
 }
 
-.btn-primary {
-    width: 100%;
-    padding: 1rem 2rem;
-    border: none;
+.btn-primary, .btn-secondary {
+    padding: 0.8rem 1.5rem;
     border-radius: 12px;
     font-family: var(--font-display);
     font-weight: 600;
-    font-size: 1rem;
-    color: #fff;
-    background: var(--accent-gradient);
+    font-size: 0.95rem;
     cursor: pointer;
     position: relative;
     overflow: hidden;
@@ -461,6 +459,13 @@ input:focus ~ .input-focus-line {
     align-items: center;
     justify-content: center;
     gap: 0.75rem;
+}
+
+.btn-primary {
+    flex: 2;
+    border: none;
+    color: #fff;
+    background: var(--accent-gradient);
 }
 
 .btn-primary::before {
@@ -493,6 +498,24 @@ input:focus ~ .input-focus-line {
     transform: none;
 }
 
+.btn-secondary {
+    flex: 1;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+}
+
+.btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.2);
+    color: var(--text-primary);
+    transform: translateY(-2px);
+}
+
+.btn-secondary:active {
+    transform: translateY(0);
+}
+
 .btn-icon svg {
     width: 18px;
     height: 18px;
@@ -501,6 +524,10 @@ input:focus ~ .input-focus-line {
 
 .btn-primary:hover .btn-icon svg {
     transform: translateX(4px);
+}
+
+.btn-secondary:hover .btn-icon svg {
+    transform: rotate(90deg);
 }
 
 /* ========================================
@@ -994,6 +1021,17 @@ input:focus ~ .input-focus-line {
 
 @keyframes spin {
     to { transform: rotate(360deg); }
+}
+
+.footer-link-inline {
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: all var(--transition-fast);
+}
+
+.footer-link-inline:hover {
+    color: var(--accent-secondary);
+    text-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
 }
 
 /* ========================================
