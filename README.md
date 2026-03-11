@@ -7,7 +7,7 @@ ___
 
 ## 🚀 Overview  
 
-The **CosmoClassifier** uses a trained **Random Forest Classifier** optimized through **Sequential Feature Selection (SFS)** to predict whether a given object in the universe is a **Galaxy**, **Star**, or **Quasar (QSO)**.  
+The **CosmoClassifier** uses a trained **Logistic Regression** model optimized through **RandomizedSearchCV** to predict whether a given object in the universe is a **Galaxy**, **Star**, or **Quasar (QSO)**.  
 The model is hosted via a **Flask** web app where users can input photometric parameters (like magnitudes and redshift) and get instant predictions with probability scores.  
 
 ---
@@ -47,8 +47,9 @@ This project simplifies that complexity—transforming high-dimensional SDSS dat
 | :--- | :--- |
 | **Imputation** | Missing values handled using median strategy |
 | **Scaling** | Standardized with `StandardScaler` |
-| **Feature Selection** | Sequential Feature Selector (SFS) with Random Forest |
-| **Classifier** | Random Forest Classifier (max_depth = 10, n_estimators = 150, class_weight = "balanced") |
+| **Oversampling** | Class imbalance handled using `SMOTE` |
+| **Dimensionality Reduction** | Passthrough (No reduction applied) |
+| **Classifier** | Logistic Regression (penalty = 'l1', solver = 'saga', C = 10) |
 
 Final model artifacts are serialized with `joblib` as:
 ```
@@ -65,14 +66,14 @@ Previously, multiple combinations of models and dimensionality-reduction methods
  Here is the **Classification Report** which was calculated after fitting the best model discovered by RandomizedSearchCV:
  | Class            | Precision | Recall | F1-Score | Support |
 |-----------------|-----------|--------|----------|---------|
-| 0 (GALAXY)              | 0.99      | 0.99   | 0.99     | 10469   |
-| 1 (STAR)              | 0.99      | 1.00   | 0.99     | 7446    |
-| 2 (QSO)              | 0.97      | 0.96   | 0.97     | 2085    |
-| **Accuracy**    | -         | -      | 0.99     | 20000   |
-| **Macro Avg**   | 0.98      | 0.98   | 0.98     | 20000   |
-| **Weighted Avg**| 0.99      | 0.99   | 0.99     | 20000   |
+| 0 (GALAXY)              | 0.99      | 0.96   | 0.98     | 10469   |
+| 1 (STAR)              | 0.96      | 1.00   | 0.98     | 7446    |
+| 2 (QSO)              | 0.96      | 0.96   | 0.96     | 2085    |
+| **Accuracy**    | -         | -      | 0.97     | 20000   |
+| **Macro Avg**   | 0.97      | 0.97   | 0.97     | 20000   |
+| **Weighted Avg**| 0.98      | 0.97   | 0.97     | 20000   |
 
-You can find the code for this in [research.py](https://github.com/ByteBard58/The_CosmoClassifier/blob/main/research.py) file included in the repo. Note that this result is for the full dataset with all original features.
+You can find the code for this in [research_2.py](https://github.com/ByteBard58/The_CosmoClassifier/blob/main/research_2.py) file included in the repo. Note that this result is for the reduced feature dataset.
 
 ---
 

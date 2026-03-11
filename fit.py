@@ -125,9 +125,11 @@ def model(x,y) -> BaseEstimator:
   minutes,seconds = np.divmod((t2-t1),60)
   print(f"⌛️ Time Elapsed: {minutes} Minutes {seconds:.2f} Seconds")
   estimator = rscv.best_estimator_
+  config = rscv.best_params_
+  print(f"\nBest Parameters Configuration from randomized search:\n{config}")
   y_true = y_test
   y_pred = estimator.predict(x_test)
-  print(classification_report(y_true,y_pred))
+  print(f"Classification Report:\n{classification_report(y_true,y_pred)}")
 
   return estimator
 
@@ -137,9 +139,9 @@ def dumping(pipe,column_names):
     os.makedirs("models",exist_ok=True)
     joblib.dump(pipe, "models/estimator.pkl")
     joblib.dump(column_names, "models/column_names.pkl")
-    print("Saved models/pipe.pkl and models/column_names.pkl successfully ✅")
+    print("\nSaved models/pipe.pkl and models/column_names.pkl successfully ✅")
   except Exception as e:
-    print(f"Something went wrong while dumping. Message: {e}")
+    print(f"\nSomething went wrong while dumping. Message: {e}")
 
 def main():
   x,y,column_names = data_collection()
