@@ -4,12 +4,18 @@ on:
   push:
     branches:
       - main
-    paths-ignore:
-      - 'README.md'
-      - 'LICENSE'
-      - 'reports/**'
-      - 'screenshots/**'
-      - 'research*.py'
+    paths:
+      - 'Datasets'
+      - '.github/workflows/docker.yml'
+      - 'app.py'
+      - 'Dockerfile'
+      - 'requirements.txt'
+      - 'templates/**'
+      - 'static/**'
+      - 'models/**'
+      - 'scripts/**'
+      - 'fit.py'
+      - '.dockerignore'
 
 jobs:
   docker-build:
