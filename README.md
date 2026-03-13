@@ -54,7 +54,7 @@ This project simplifies that complexity—transforming high-dimensional SDSS dat
 Final model artifacts are serialized with `joblib` as:
 ```
 models/
-├── pipe.pkl
+├── estimator.pkl
 └── column_names.pkl
 ```
 ---
@@ -79,28 +79,44 @@ You can find the code for this in [research_2.py](https://github.com/ByteBard58/
 
 ## 🧩 Project Structure
 ```
-THE_COSMOCLASSIFIER/
-├── Datasets/
-│   └── SDSS_DR18.csv        # Primary dataset for training and analysis
-├── models/
-│   ├── column_names.pkl     # List of column names used in the model
-│   └── pipe.pkl             # Serialized machine learning pipeline (model)
-├── reports/
-│   ├── research.html        # Static HTML report of the research notebook
-│   └── research_2.html      # Static HTML report of the research_2 notebook
-├── static/                  # Static assets for the web application
-│   ├── script.js            # Frontend JavaScript logic
-│   └── style.css            # Frontend CSS styling
-├── templates/
-│   └── index.html           # HTML template for the web application
-|
-├── .gitignore               # Files and directories to be excluded from version control
-├── app.py                   # Main Flask application file for the web service
-├── fit.py                   # Script for training and saving the machine learning model
-├── LICENSE                  # Licensing information
-├── research.py              # Marimo notebook for initial research
-├── research_2.py            # Marimo notebook for feature reduction research
-└── requirements.txt         # Python package dependencies
+CosmoClassifier/
+├─ .github/
+│  └─ workflows/
+│     ├─ check.yml
+│     ├─ docker.yml
+│     └─ python-app.yml
+├─ Datasets/
+│  └─ SDSS_DR18.csv
+├─ models/
+│  ├─ column_names.pkl
+│  └─ estimator.pkl
+├─ reports/
+│  ├─ research_2.html
+│  └─ research.html
+├─ screenshots/
+│  ├─ ss_filled.png
+│  └─ ss_home.png
+├─ static/
+│  ├─ confusion_matrix.png
+│  ├─ script.js
+│  └─ style.css
+├─ templates/
+│  └─ index.html
+├─ .dockerignore
+├─ .env.example
+├─ .gitattributes
+├─ .gitignore
+├─ app.py
+├─ conf_mat.py
+├─ Dockerfile
+├─ fit.py
+├─ health_checker.py
+├─ LICENSE
+├─ README.md
+├─ requirements.txt
+├─ research_2.py
+└─ research.py
+
 ```
 ---
 ## 💻 Installation & Usage  
