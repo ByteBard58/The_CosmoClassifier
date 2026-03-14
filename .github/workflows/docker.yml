@@ -59,10 +59,3 @@ jobs:
           push: true
           tags: bytebard101/cosmoclassifier:latest
 
-  skip-docker-build:
-    needs: changes
-    if: ${{ needs.changes.outputs.should_run == 'false' }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Skip docker build (no relevant files changed)
-        run: echo "No relevant files changed. Skipping Docker build."
