@@ -24,12 +24,15 @@ jobs:
         with:
           filters: |
             src:
-              - '**'
-              - '!README.md'
-              - '!LICENSE'
-              - '!reports/**'
-              - '!screenshots/**'
-              - '!research*.py'
+              - 'app.py'
+              - 'fit.py'
+              - 'requirements.txt'
+              - 'templates/**'
+              - 'static/**'
+              - 'models/**'
+              - 'scripts/**'
+              - 'Datasets/**'
+              - '.github/workflows/python-app.yml'
 
   build:
     needs: changes
@@ -59,3 +62,11 @@ jobs:
         sleep 10
         curl -I http://127.0.0.1:5000
         pkill -f "python app.py"
+
+  skip-build:
+    needs: changes
+    if: ${{ needs.changes.outputs.should_run == 'false' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Skip build (no relevant files changed)
+        run: echo "No relevant files changed. Skipping build."
