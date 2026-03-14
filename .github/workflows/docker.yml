@@ -4,21 +4,35 @@ on:
   push:
     branches:
       - main
-    paths:
-      - 'Datasets'
-      - '.github/workflows/docker.yml'
-      - 'app.py'
-      - 'Dockerfile'
-      - 'requirements.txt'
-      - 'templates/**'
-      - 'static/**'
-      - 'models/**'
-      - 'scripts/**'
-      - 'fit.py'
-      - '.dockerignore'
 
 jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      should_run: ${{ steps.filter.outputs.src }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            src:
+              - 'Datasets/**'
+              - 'Datasets'
+              - '.github/workflows/docker.yml'
+              - 'app.py'
+              - 'Dockerfile'
+              - 'requirements.txt'
+              - 'templates/**'
+              - 'static/**'
+              - 'models/**'
+              - 'scripts/**'
+              - 'fit.py'
+              - '.dockerignore'
+
   docker-build:
+    needs: changes
+    if: ${{ needs.changes.outputs.should_run == 'true' }}
     runs-on: ubuntu-latest
 
     steps:

@@ -6,27 +6,34 @@ name: Python application
 on:
   push:
     branches: [ "main" ]
-    paths-ignore:
-      - 'README.md'
-      - 'LICENSE'
-      - 'reports/**'
-      - 'screenshots/**'
-      - 'research*.py'
   pull_request:
     branches: [ "main" ]
-    paths-ignore:
-      - 'README.md'
-      - 'LICENSE'
-      - 'reports/**'
-      - 'screenshots/**'
-      - 'research*.py'
 
 permissions:
   contents: read
 
 jobs:
-  build:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      should_run: ${{ steps.filter.outputs.src }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            src:
+              - '**'
+              - '!README.md'
+              - '!LICENSE'
+              - '!reports/**'
+              - '!screenshots/**'
+              - '!research*.py'
 
+  build:
+    needs: changes
+    if: ${{ needs.changes.outputs.should_run == 'true' }}
     runs-on: ubuntu-latest
 
     steps:
