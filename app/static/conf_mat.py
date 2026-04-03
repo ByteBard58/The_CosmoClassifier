@@ -152,7 +152,7 @@ def plotting(x, y) -> None:
     # ── Save ─────────────────────────────────────────────────────────────────
     plt.tight_layout()
     plt.savefig(
-        "static/confusion_matrix.png",
+        "app/static/confusion_matrix.png",
         dpi=150,
         facecolor=BG_COLOR,
         edgecolor='none',
