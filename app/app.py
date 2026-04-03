@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, jsonify
 import joblib
 import numpy as np
-from fit import main
+from models.fit import main
 import os
 
 app = Flask(__name__)
