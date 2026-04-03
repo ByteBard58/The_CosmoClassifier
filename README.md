@@ -129,8 +129,8 @@ CosmoClassifier/
 
 ### 1️⃣ Clone the Repository  
 ```bash
-git clone https://github.com/ByteBard58/The_CosmoClassifier
-cd The_CosmoClassifier
+git clone https://github.com/ByteBard58/CosmoClassifier
+cd CosmoClassifier
 ```
 ### 2️⃣ Install Dependencies
 ```bash
