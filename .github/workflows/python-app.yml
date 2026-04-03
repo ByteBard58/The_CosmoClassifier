@@ -24,12 +24,10 @@ jobs:
         with:
           filters: |
             src:
-              - 'app.py'
-              - 'fit.py'
+              - 'app/**'
+              - 'models/fit.py'
               - 'requirements.txt'
-              - 'templates/**'
-              - 'static/**'
-              - 'models/**'
+              - 'notebooks/**'
               - 'scripts/**'
               - 'Datasets/**'
               - '.github/workflows/python-app.yml'
@@ -58,8 +56,8 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Run Flask app and test with Curl
       run: |
-        nohup python app.py &
+        nohup python -m app.app &
         sleep 10
         curl -I http://127.0.0.1:5000
-        pkill -f "python app.py"
+        pkill -f "python -m app.app"
 
