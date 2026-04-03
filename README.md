@@ -85,37 +85,43 @@ CosmoClassifier/
 │     ├─ check.yml
 │     ├─ docker.yml
 │     └─ python-app.yml
+├─ app/
+│  ├─ schema/
+│  │  └─ validation.py
+│  ├─ static/
+│  │  ├─ confusion_matrix.png
+│  │  ├─ conf_mat.py
+│  │  ├─ script.js
+│  │  └─ style.css
+│  ├─ templates/
+│  │  └─ index.html
+│  ├─ app.py
+│  └─ __init__.py
 ├─ Datasets/
 │  └─ SDSS_DR18.csv
 ├─ models/
+│  ├─ __init__.py
+│  ├─ fit.py
 │  ├─ column_names.pkl
 │  └─ estimator.pkl
+├─ notebooks/
+│  ├─ __init__.py
+│  ├─ research_2.py
+│  └─ research.py
 ├─ reports/
 │  ├─ research_2.html
 │  └─ research.html
 ├─ screenshots/
 │  ├─ ss_filled.png
 │  └─ ss_home.png
-├─ static/
-│  ├─ confusion_matrix.png
-│  ├─ script.js
-│  └─ style.css
-├─ templates/
-│  └─ index.html
 ├─ .dockerignore
 ├─ .env.example
 ├─ .gitattributes
 ├─ .gitignore
-├─ app.py
-├─ conf_mat.py
 ├─ Dockerfile
-├─ fit.py
-├─ health_checker.py
 ├─ LICENSE
 ├─ README.md
-├─ requirements.txt
-├─ research_2.py
-└─ research.py
+└─ requirements.txt
 
 ```
 ---
@@ -132,12 +138,13 @@ pip install -r requirements.txt
 ```
 ### 3️⃣ Run the App
 ```bash
-python app.py
+python -m app.app
 ```
 
 ### 4️⃣ Run Marimo Notebooks (Optional)
 To explore the research notebooks interactively:
 ```bash
+cd notebooks/
 marimo edit research.py
 # OR
 marimo edit research_2.py
