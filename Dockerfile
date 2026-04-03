@@ -14,8 +14,8 @@ RUN pip install --upgrade pip && pip install -r requirements.txt
 COPY . .
 
 # example env and port
-ENV FLASK_APP=app.py
+ENV FLASK_APP=app.app
 EXPOSE 5000
 
 # run the flask app
-CMD ["gunicorn", "--bind", "0.0.0.0:5000", "app:app", "--workers", "2"]
+CMD ["gunicorn", "--bind", "0.0.0.0:5000", "app.app:app", "--workers", "2"]
