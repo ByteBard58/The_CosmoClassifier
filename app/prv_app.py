@@ -1,14 +1,16 @@
 from flask import Flask, render_template, request, jsonify
+from sklearn.pipeline import Pipeline
+import numpy as np
 import joblib
 import numpy as np
 from models.fit import main
+from typing import Tuple
 import os
 
 app = Flask(__name__)
 
 # Check for model and column names files, create them if they don't exist
-def load_or_create_models():
-    global pipe, column_names
+def load_or_create_models() -> Tuple[Pipeline,np.ndarray]:
     model_path = "models/estimator.pkl"
     columns_path = "models/column_names.pkl"
     
@@ -27,11 +29,12 @@ def load_or_create_models():
         pipe = joblib.load(model_path)
         column_names = joblib.load(columns_path)
         print("Artifacts are loaded successfully! Ready for prediction....")
+        return pipe,column_names
     except Exception as e:
         print(f"Artifacts could not be loaded ! Error: {e}")
 
 # Load or create models at startup
-load_or_create_models()
+pipe, column_names = load_or_create_models()
 
 # Human-readable labels for inputs
 # Human-readable labels for inputs
