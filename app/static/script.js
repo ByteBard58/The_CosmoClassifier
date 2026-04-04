@@ -63,12 +63,28 @@ function initPredictForm() {
         
         try {
             const formData = new FormData(form);
+            const dataObj = Object.fromEntries(formData.entries());
+            
+            // Convert numeric strings to numbers
+            for (let key in dataObj) {
+                if (!isNaN(dataObj[key]) && dataObj[key] !== "") {
+                    dataObj[key] = parseFloat(dataObj[key]);
+                }
+            }
+
             const response = await fetch("/predict", { 
                 method: "POST", 
-                body: formData 
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(dataObj)
             });
 
-            if (!response.ok) throw new Error("Prediction failed");
+            if (!response.ok) {
+                const errorData = await response.json();
+                const errorMessage = errorData.error || errorData.message || "Prediction failed";
+                throw new Error(errorMessage);
+            }
 
             const data = await response.json();
             
@@ -89,7 +105,7 @@ function initPredictForm() {
             
         } catch (error) {
             console.error(error);
-            showToast('Error: Could not connect to the prediction service.', 'error');
+            showToast(`Error: ${error.message}`, 'error');
             // Show awaiting state again on error
             awaitingDiv.style.display = 'flex';
             resultDiv.classList.add("hidden");

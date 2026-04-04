@@ -1,5 +1,7 @@
 from fastapi import FastAPI, Depends, Request
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, FileResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.exceptions import RequestValidationError
 from typing import Tuple,List
 from sklearn.pipeline import Pipeline
 from models.fit import main
@@ -45,6 +47,24 @@ async def lifespan(app:FastAPI):
 
 app = FastAPI(title="CosmoClassifier", version="2.0(FastAPI)", lifespan=lifespan)
 
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    errors = exc.errors()
+    # Flatten error messages for the frontend
+    error_msgs = []
+    for err in errors:
+        field = err['loc'][-1]
+        msg = err['msg']
+        error_msgs.append(f"Invalid {field}: {msg}")
+    
+    return JSONResponse(
+        status_code=422,
+        content={"message": "validation failed", "error": "; ".join(error_msgs)},
+    )
+
+# Mount static files
+app.mount("/static", StaticFiles(directory=Path(__file__).parent / "static"), name="static")
+
 # Helper for providing the pipeline and column names
 def get_model(request:Request) -> Tuple[Pipeline,np.ndarray]:
     return request.app.state.pipe, request.app.state.column_names
@@ -64,10 +84,8 @@ def health():
 
 @app.get("/")
 def home():
-    msg = "Welcome to CosmoClassifier API. Provide the designated inputs " \
-    "in the `predict` route to run predictions." \
-    " Check the GitHub Repository for more."
-    return msg
+    index_path = Path(__file__).parent / "templates" / "index.html"
+    return FileResponse(index_path)
 
 @app.post("/predict",status_code=201)
 def prediction_ops(value:UserInput, dep:Tuple[Pipeline,np.ndarray] = Depends(get_model)):
@@ -100,7 +118,11 @@ def prediction_ops(value:UserInput, dep:Tuple[Pipeline,np.ndarray] = Depends(get
     pred_label = label_map.get(pred_label)
     pred_proba = {lmv:round(proba,3) for lmv,proba in zip(label_map.values(), pred_proba)}
 
-    msg = {"message":"prediction successful","predicted_class":pred_label, "prediction_probability":pred_proba}
+    msg = {
+        "message": "prediction successful",
+        "prediction": pred_label, 
+        "probabilities": pred_proba
+    }
     return JSONResponse(
         status_code=201, content=msg
     )

@@ -10,7 +10,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
 
@@ -68,15 +68,51 @@
                 <div class="panel panel-left">
                     <form id="predictForm" class="predict-form">
                         <div class="input-stack">
-                            {% for col, label in zip(columns, labels) %}
-                                {% if col != 'class' %}
-                                <div class="input-group">
-                                    <input type="number" id="{{ col }}" name="{{ col }}" placeholder=" " step="any" required>
-                                    <label for="{{ col }}">{{ label }}</label>
-                                    <div class="input-focus-line"></div>
-                                </div>
-                                {% endif %}
-                            {% endfor %}
+                            <div class="input-group">
+                                <input type="number" id="ra" name="ra" placeholder=" " step="any" required>
+                                <label for="ra">Right Ascension</label>
+                                <div class="input-focus-line"></div>
+                            </div>
+                            <div class="input-group">
+                                <input type="number" id="dec" name="dec" placeholder=" " step="any" required>
+                                <label for="dec">Declination</label>
+                                <div class="input-focus-line"></div>
+                            </div>
+                            <div class="input-group">
+                                <input type="number" id="redshift" name="redshift" placeholder=" " step="any" required>
+                                <label for="redshift">Redshift Value</label>
+                                <div class="input-focus-line"></div>
+                            </div>
+                            <div class="input-group">
+                                <input type="number" id="psfMag_r" name="psfMag_r" placeholder=" " step="any" required>
+                                <label for="psfMag_r">PSF Mag (r)</label>
+                                <div class="input-focus-line"></div>
+                            </div>
+                            <div class="input-group">
+                                <input type="number" id="u" name="u" placeholder=" " step="any" required>
+                                <label for="u">u-band</label>
+                                <div class="input-focus-line"></div>
+                            </div>
+                            <div class="input-group">
+                                <input type="number" id="g" name="g" placeholder=" " step="any" required>
+                                <label for="g">g-band</label>
+                                <div class="input-focus-line"></div>
+                            </div>
+                            <div class="input-group">
+                                <input type="number" id="r" name="r" placeholder=" " step="any" required>
+                                <label for="r">r-band</label>
+                                <div class="input-focus-line"></div>
+                            </div>
+                            <div class="input-group">
+                                <input type="number" id="i" name="i" placeholder=" " step="any" required>
+                                <label for="i">i-band</label>
+                                <div class="input-focus-line"></div>
+                            </div>
+                            <div class="input-group">
+                                <input type="number" id="z" name="z" placeholder=" " step="any" required>
+                                <label for="z">z-band</label>
+                                <div class="input-focus-line"></div>
+                            </div>
                         </div>
                         
                         <div class="form-actions">
@@ -157,7 +193,7 @@
                             <div class="confusion-section">
                                 <h4 class="confusion-title">Confusion Matrix</h4>
                                 <div class="confusion-mini">
-                                    <img src="{{ url_for('static', filename='confusion_matrix.png') }}" alt="Confusion Matrix" class="confusion-thumb">
+                                    <img src="/static/confusion_matrix.png" alt="Confusion Matrix" class="confusion-thumb">
                                 </div>
                                 <div class="confusion-legend">
                                     <div class="legend-item">
@@ -257,6 +293,6 @@
 <!-- Toast Notification Container -->
 <div id="toast-container" class="toast-container"></div>
 
-<script src="{{ url_for('static', filename='script.js') }}"></script>
+<script src="/static/script.js"></script>
 </body>
 </html>
