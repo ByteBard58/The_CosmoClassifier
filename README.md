@@ -85,37 +85,43 @@ CosmoClassifier/
 │     ├─ check.yml
 │     ├─ docker.yml
 │     └─ python-app.yml
+├─ app/
+│  ├─ schema/
+│  │  └─ validation.py
+│  ├─ static/
+│  │  ├─ confusion_matrix.png
+│  │  ├─ conf_mat.py
+│  │  ├─ script.js
+│  │  └─ style.css
+│  ├─ templates/
+│  │  └─ index.html
+│  ├─ app.py
+│  └─ __init__.py
 ├─ Datasets/
 │  └─ SDSS_DR18.csv
 ├─ models/
+│  ├─ __init__.py
+│  ├─ fit.py
 │  ├─ column_names.pkl
 │  └─ estimator.pkl
+├─ notebooks/
+│  ├─ __init__.py
+│  ├─ research_2.py
+│  └─ research.py
 ├─ reports/
 │  ├─ research_2.html
 │  └─ research.html
 ├─ screenshots/
 │  ├─ ss_filled.png
 │  └─ ss_home.png
-├─ static/
-│  ├─ confusion_matrix.png
-│  ├─ script.js
-│  └─ style.css
-├─ templates/
-│  └─ index.html
 ├─ .dockerignore
 ├─ .env.example
 ├─ .gitattributes
 ├─ .gitignore
-├─ app.py
-├─ conf_mat.py
 ├─ Dockerfile
-├─ fit.py
-├─ health_checker.py
 ├─ LICENSE
 ├─ README.md
-├─ requirements.txt
-├─ research_2.py
-└─ research.py
+└─ requirements.txt
 
 ```
 ---
@@ -123,8 +129,8 @@ CosmoClassifier/
 
 ### 1️⃣ Clone the Repository  
 ```bash
-git clone https://github.com/ByteBard58/The_CosmoClassifier
-cd The_CosmoClassifier
+git clone https://github.com/ByteBard58/CosmoClassifier
+cd CosmoClassifier
 ```
 ### 2️⃣ Install Dependencies
 ```bash
@@ -132,12 +138,13 @@ pip install -r requirements.txt
 ```
 ### 3️⃣ Run the App
 ```bash
-python app.py
+uvicorn app.app:app --reload
 ```
 
 ### 4️⃣ Run Marimo Notebooks (Optional)
 To explore the research notebooks interactively:
 ```bash
+cd notebooks/
 marimo edit research.py
 # OR
 marimo edit research_2.py
@@ -159,14 +166,14 @@ The image is built on both ARM64 and AMD64 architectures, so that it can run on 
 2. Open Terminal and run:
 ```bash
 docker pull bytebard101/cosmoclassifier:latest
-docker run --rm -p 5000:5000 bytebard101/cosmoclassifier:latest
+docker run --rm -p 8000:8000 bytebard101/cosmoclassifier:latest
 ```
 3. If your machine faces a port conflict, you will need to assign another port. Try to run this:
 ```bash
-docker run --rm -p 5001:5000 bytebard101/cosmoclassifier:latest
+docker run --rm -p 8001:8000 bytebard101/cosmoclassifier:latest
 ```
 > If you followed Step 2 and the command ran successfully, then **DO NOT** follow this step.
-4. The app will be live at localhost:5000. Open your browser and navigate to [http://127.0.0.1:5000](http://127.0.0.1:5000/) (or [http://127.0.0.1:5001](http://127.0.0.1:5000/) if you followed Step 3).
+4. The app will be live at localhost:8000. Open your browser and navigate to [http://127.0.0.1:8000](http://127.0.0.1:8000/) (or [http://127.0.0.1:8001](http://127.0.0.1:8000/) if you followed Step 3).
 
 Check [Docker Documentation](https://docs.docker.com/) to learn more about Docker and it's commands.
 

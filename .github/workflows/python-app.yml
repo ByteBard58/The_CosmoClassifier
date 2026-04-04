@@ -24,12 +24,10 @@ jobs:
         with:
           filters: |
             src:
-              - 'app.py'
-              - 'fit.py'
+              - 'app/**'
+              - 'models/fit.py'
               - 'requirements.txt'
-              - 'templates/**'
-              - 'static/**'
-              - 'models/**'
+              - 'notebooks/**'
               - 'scripts/**'
               - 'Datasets/**'
               - '.github/workflows/python-app.yml'
@@ -56,10 +54,10 @@ jobs:
         flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-    - name: Run Flask app and test with Curl
+    - name: Run FastAPI app and test with Curl
       run: |
-        nohup python app.py &
+        nohup uvicorn app.app:app &
         sleep 10
-        curl -I http://127.0.0.1:5000
-        pkill -f "python app.py"
+        curl -I http://127.0.0.1:8000
+        pkill -f uvicorn
 
