@@ -53,6 +53,15 @@ def get_model(request:Request) -> Tuple[Pipeline,np.ndarray]:
 def safe_sub(a:float,b:float,val:dict):
     return val.get(a,None) - val.get(b,None)
 
+@app.get("/health",status_code=200)
+def health():
+    msg = {
+        "title":"CosmoClassifier",
+        "version":"2.0(FastAPI)",
+        "status":"All systems operational"
+    }
+    return JSONResponse(status_code=200,content=msg)
+
 @app.get("/")
 def home():
     msg = "Welcome to CosmoClassifier API. Provide the designated inputs " \
