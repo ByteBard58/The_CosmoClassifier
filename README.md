@@ -21,7 +21,7 @@ This project simplifies that complexity—transforming high-dimensional SDSS dat
 
 ## 📸 Screenshots
 ![Home Page](screenshots/ss_home.png)
-![Prediction](screenshots/ss_filled.png)
+![Prediction](screenshots/ss_batch.png)
 
 ---
 
