@@ -22,16 +22,7 @@ def preprocess(df: pd.DataFrame) -> pd.DataFrame:
 
     df["class"] = df["class"].map({"GALAXY": 0, "STAR": 1, "QSO": 2})
 
-    df = df[["ra", "dec", "redshift", "u", "g", "r", "i", "z", "psfMag_r", "class"]].copy()
-
-    df["u_g_color"] = df["u"] - df["g"]
-    df["g_r_color"] = df["g"] - df["r"]
-    df["r_i_color"] = df["r"] - df["i"]
-    df["i_z_color"] = df["i"] - df["z"]
-    df = df.drop(columns=["u", "g", "r", "i", "z"])
-
-    popped_class = df.pop("class")
-    df.insert(len(df.columns), "class", popped_class)
+    df = df[["ra", "dec", "redshift","psfMag_r",  "u", "g", "r", "i", "z", "class"]].copy()
 
     return df
 
