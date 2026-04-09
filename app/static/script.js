@@ -7,6 +7,7 @@ document.addEventListener("DOMContentLoaded", function() {
     // Initialize components
     initTabNavigation();
     initPredictForm();
+    initBatchPredictForm();
     initKeyboardShortcuts();
 });
 
@@ -64,6 +65,14 @@ function initPredictForm() {
         try {
             const formData = new FormData(form);
             const dataObj = Object.fromEntries(formData.entries());
+            
+            // Manual validation check to ensure no empty values
+            const requiredFields = ["ra", "dec", "redshift", "psfMag_r", "u", "g", "r", "i", "z"];
+            for (let field of requiredFields) {
+                if (dataObj[field] === undefined || dataObj[field] === "") {
+                    throw new Error("Please fill in all inputs before analyzing.");
+                }
+            }
             
             // Convert numeric strings to numbers
             for (let key in dataObj) {
@@ -286,3 +295,179 @@ window.CosmoClassifier = {
     formatNumber,
     debounce
 };
+
+/**
+ * Batch Prediction Form Handler
+ */
+function initBatchPredictForm() {
+    const fileInput = document.getElementById("batchFile");
+    const dropzone = document.getElementById("fileUploadDropzone");
+    const fileInfo = document.getElementById("fileInfo");
+    const selectedFileName = document.getElementById("selectedFileName");
+    const selectedFileSize = document.getElementById("selectedFileSize");
+    const removeFileBtn = document.getElementById("removeFileBtn");
+    const submitBtn = document.getElementById("batchPredictBtn");
+    const form = document.getElementById("batchPredictForm");
+    
+    if(!fileInput) return;
+
+    const awaitingBatch = document.getElementById("awaiting-batch");
+    const batchResult = document.getElementById("batch-result");
+    const tbody = document.getElementById("batchTableBody");
+
+    const MAX_SIZE = 5 * 1024 * 1024; // 5MB
+
+    function handleFile(file) {
+        if (!file) return;
+        
+        if (!file.name.toLowerCase().endsWith('.csv')) {
+            showToast("Only .csv files are allowed", "error");
+            fileInput.value = "";
+            return;
+        }
+        
+        if (file.size > MAX_SIZE) {
+            showToast("File size exceeds 5MB limit", "error");
+            fileInput.value = "";
+            return;
+        }
+
+        selectedFileName.textContent = file.name;
+        selectedFileSize.textContent = (file.size / 1024 / 1024).toFixed(2) + " MB";
+        
+        dropzone.classList.add("hidden");
+        fileInfo.classList.remove("hidden");
+        submitBtn.disabled = false;
+    }
+
+    fileInput.addEventListener("change", (e) => {
+        handleFile(e.target.files[0]);
+    });
+
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        dropzone.addEventListener(eventName, preventDefaults, false);
+    });
+
+    function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+
+    ['dragenter', 'dragover'].forEach(eventName => {
+        dropzone.addEventListener(eventName, () => {
+            dropzone.style.borderColor = "var(--accent-secondary)";
+        }, false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+        dropzone.addEventListener(eventName, () => {
+            dropzone.style.borderColor = "";
+        }, false);
+    });
+
+    dropzone.addEventListener('drop', (e) => {
+        let dt = e.dataTransfer;
+        let files = dt.files;
+        if (files.length) {
+            fileInput.files = files;
+            handleFile(files[0]);
+        }
+    }, false);
+
+    removeFileBtn.addEventListener("click", () => {
+        fileInput.value = "";
+        dropzone.classList.remove("hidden");
+        fileInfo.classList.add("hidden");
+        submitBtn.disabled = true;
+    });
+
+    form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        
+        if (!fileInput.files[0]) return;
+
+        setLoadingState(submitBtn, true);
+        awaitingBatch.style.display = 'none';
+        batchResult.classList.add("hidden");
+
+        try {
+            const formData = new FormData();
+            formData.append("payload", fileInput.files[0]);
+
+            const response = await fetch("/predict/file", {
+                method: "POST",
+                body: formData
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.detail || errorData.message || "Batch prediction failed");
+            }
+
+            const data = await response.json();
+            
+            renderBatchResults(data);
+            showToast('Batch classification complete!', 'success');
+            
+        } catch (error) {
+            console.error(error);
+            showToast(`Error: ${error.message}`, 'error');
+            awaitingBatch.style.display = 'flex';
+        } finally {
+            setLoadingState(submitBtn, false);
+        }
+    });
+
+    let batchChart = null;
+
+    function renderBatchResults(data) {
+        const preds = data.prediction;
+        const probs = data.probabilities;
+        
+        tbody.innerHTML = "";
+        
+        let counts = { "GALAXY": 0, "STAR": 0, "QSO": 0 };
+
+        preds.forEach((pred, index) => {
+            counts[pred] = (counts[pred] || 0) + 1;
+            
+            const maxProb = (Math.max(...probs[index]) * 100).toFixed(1);
+            
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+                <td>Row ${index + 1}</td>
+                <td><span class="batch-badge batch-${pred.toLowerCase()}">${pred}</span></td>
+                <td>${maxProb}%</td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+        batchResult.classList.remove("hidden");
+
+        // Render Chart
+        const ctx = document.getElementById('batchPieChart').getContext('2d');
+        if (batchChart) batchChart.destroy();
+
+        batchChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['GALAXY', 'STAR', 'QSO'],
+                datasets: [{
+                    data: [counts['GALAXY'], counts['STAR'], counts['QSO']],
+                    backgroundColor: ['#7000ff', '#00d4ff', '#ff6b6b'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: { color: '#ffffff' }
+                    }
+                }
+            }
+        });
+    }
+}

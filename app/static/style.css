@@ -1035,6 +1035,224 @@ input:focus ~ .input-focus-line {
 }
 
 /* ========================================
+   Batch UI Enhancements
+   ======================================== */
+
+.file-upload-container {
+    border: 2px dashed rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    padding: 2rem 1rem;
+    text-align: center;
+    transition: all 0.3s ease;
+    background: rgba(0, 0, 0, 0.2);
+    position: relative;
+    cursor: pointer;
+    margin-bottom: 1.5rem;
+}
+
+.file-upload-container:hover {
+    border-color: var(--accent-secondary);
+    background: rgba(0, 212, 255, 0.05);
+}
+
+.file-input-hidden {
+    position: absolute;
+    width: 0;
+    height: 0;
+    opacity: 0;
+    visibility: hidden;
+}
+
+.file-upload-label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    gap: 1rem;
+}
+
+.upload-icon {
+    width: 48px;
+    height: 48px;
+    color: var(--accent-secondary);
+    background: rgba(0, 212, 255, 0.1);
+    border-radius: 50%;
+    padding: 12px;
+}
+
+.upload-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    display: block;
+}
+
+.upload-subtitle {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.file-info {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1rem;
+    padding: 0.5rem 1rem;
+    background: rgba(0, 212, 255, 0.1);
+    border-radius: 8px;
+    border: 1px solid rgba(0, 212, 255, 0.2);
+}
+
+.file-name {
+    font-family: var(--font-mono);
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.file-size {
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+}
+
+.btn-remove-file {
+    background: none;
+    border: none;
+    color: var(--error);
+    cursor: pointer;
+    font-size: 1.2rem;
+    line-height: 1;
+}
+
+.btn-remove-file:hover {
+    color: #ff8a80;
+}
+
+.batch-table-container {
+    max-height: 300px;
+    overflow-y: auto;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.batch-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    font-size: 0.85rem;
+}
+
+.batch-table th, .batch-table td {
+    padding: 0.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.batch-badge {
+    font-size: 0.85rem;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+    color: #fff;
+}
+
+.batch-galaxy { background: var(--galaxy); }
+.batch-star { background: var(--star); }
+.batch-qso { background: var(--qso); }
+
+.batch-table th {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-secondary);
+    font-weight: 600;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.mt-4 {
+    margin-top: 1rem;
+}
+
+.chart-container {
+    width: 100%;
+    max-width: 200px;
+    margin: 0 auto;
+}
+
+.batch-guidelines {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    background: rgba(68, 138, 255, 0.05);
+    border: 1px solid rgba(68, 138, 255, 0.2);
+    border-radius: 12px;
+}
+
+.guidelines-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+    color: var(--info);
+}
+
+.info-icon {
+    width: 18px;
+    height: 18px;
+}
+
+.guidelines-header h4 {
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.guideline-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.guideline-list li {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    line-height: 1.4;
+    padding-left: 1.2rem;
+    position: relative;
+}
+
+.guideline-list li::before {
+    content: '•';
+    position: absolute;
+    left: 0;
+    color: var(--info);
+}
+
+.guideline-list code {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 0.1rem 0.3rem;
+    border-radius: 4px;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--accent-secondary);
+}
+
+.guideline-warning {
+    color: #ff8a80 !important;
+    background: rgba(255, 82, 82, 0.05);
+    padding: 0.5rem 0.5rem 0.5rem 1.2rem !important;
+    border-radius: 6px;
+    margin-top: 0.25rem;
+}
+
+.guideline-warning::before {
+    display: none;
+}
+
+/* ========================================
    Responsive Design
    ======================================== */
 
