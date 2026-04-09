@@ -2,15 +2,18 @@ from pydantic import BaseModel
 from fastapi import FastAPI, Depends, Request, UploadFile
 from fastapi.responses import JSONResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
-from fastapi.exceptions import RequestValidationError
+from fastapi.exceptions import RequestValidationError, HTTPException
 from typing import Tuple,List
 from sklearn.pipeline import Pipeline
 from models.fit import main
 from .schema.validation import UserInput
 from pathlib import Path
+from uuid import uuid4
 from contextlib import asynccontextmanager
-import joblib
+import shutil
 import numpy as np
+import pandas as pd
+import joblib
 import os
 
 # Helper for loading and self-healing the artifacts
@@ -37,6 +40,7 @@ def load_or_create_models() -> Tuple[Pipeline,np.ndarray]:
     except Exception as e:
         raise RuntimeError(f"Artifacts could not be loaded: {e}")
     
+# Helper for performing feature engineering
 def preprocess_data(value:BaseModel) -> dict:
     # Preprocessing
     value:dict = value.model_dump(mode="json")
@@ -48,6 +52,23 @@ def preprocess_data(value:BaseModel) -> dict:
     final_value["i_z_color"] = safe_sub("i","z",value)
 
     return final_value
+
+# Helper for validating user-provided csv files
+def upload_validator(df:pd.DataFrame,col_names:List[str]) -> pd.DataFrame:
+    if df.columns.tolist() != col_names:
+        raise HTTPException(
+            status_code=422, detail="Uploaded csv file does not match the expected " \
+            "columns or their order"
+        )
+    
+    try:
+        df = df.astype(float)
+    except Exception as e:
+        raise HTTPException(
+            status_code=422,
+            detail="All values must be numeric (float-compatible)"
+        )
+    return df
 
 @asynccontextmanager
 async def lifespan(app:FastAPI):
@@ -134,30 +155,43 @@ def prediction_ops(value:UserInput, dep:Tuple[Pipeline,np.ndarray] = Depends(get
     )
 
 @app.post("/predict/file")
-def prediction_via_file_ops(value:UploadFile, dep: Tuple[Pipeline,np.ndarray] = Depends(get_model)):
+async def prediction_via_file_ops(payload:UploadFile, dep: Tuple[Pipeline,np.ndarray] = Depends(get_model)):
     pipe, column_names = dep
     column_names:List[str] = column_names.tolist()
-    final_value:dict = preprocess_data(value)
+    column_names = [i for i in column_names if i not in ["class"]]
 
-    # Order Check and running prediction
-    final_res = []
-    for col in column_names:
-        if col == "class":
-            continue
-        else:
-            final_res.append(final_value.get(col,None))
-    final_res = np.array(final_res).reshape(1,-1)
+    ## Save the incoming .csv file on disk
+    accepted_exts = [".csv"]
+    UPLOAD_DIR = Path("app","uploads")
+    UPLOAD_DIR.mkdir(exist_ok=True)
+    extension = Path(payload.filename).suffix
+    if extension not in accepted_exts:
+        raise HTTPException(
+            status_code=422, 
+            detail=f"Uploaded data must be in '.csv' format, got {extension} instead"
+        )
+    filename = f"{uuid4()}{extension}"
+    DESTINATION = UPLOAD_DIR / filename
 
-    pred_label = int(pipe.predict(final_res))
-    pred_proba = pipe.predict_proba(final_res).tolist()
+    try:
+        with open(DESTINATION,"wb") as f:
+            shutil.copyfileobj(payload.file,f)
+    except Exception as e:
+        return f"Error during payload dump procedure: {e}"
+
+    df = pd.read_csv(DESTINATION)
+    df = upload_validator(df,column_names)
+
+    pred_label:list[float] = pipe.predict(df).tolist()
+    pred_proba:list[list[float]] = pipe.predict_proba(df).tolist()
 
     # Postprocessing
     label_map = {0: "GALAXY", 1: "STAR", 2: "QSO"}
-    pred_label = label_map.get(pred_label)
-    pred_proba = {lmv:round(proba,3) for lmv,proba in zip(label_map.values(), pred_proba)}
+    pred_label:list[str] = [label_map.get(pred) for pred in pred_label]
+    pred_proba = [[round(r) for r in pred] for pred in pred_proba]
 
     msg = {
-        "message": "prediction successful",
+        "message": "batch prediction successful",
         "prediction": pred_label, 
         "probabilities": pred_proba
     }
