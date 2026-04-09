@@ -157,8 +157,7 @@ def prediction_ops(value:UserInput, dep:Tuple[Pipeline,np.ndarray] = Depends(get
 @app.post("/predict/file")
 async def prediction_via_file_ops(payload:UploadFile, dep: Tuple[Pipeline,np.ndarray] = Depends(get_model)):
     pipe, column_names = dep
-    column_names:List[str] = column_names.tolist()
-    column_names = [i for i in column_names if i not in ["class"]]
+    expected_upload_cols = ['ra', 'dec', 'redshift', 'psfMag_r', 'u', 'g', 'r', 'i', 'z']
 
     ## Save the incoming .csv file on disk
     accepted_exts = [".csv"]
@@ -180,7 +179,20 @@ async def prediction_via_file_ops(payload:UploadFile, dep: Tuple[Pipeline,np.nda
         return f"Error during payload dump procedure: {e}"
 
     df = pd.read_csv(DESTINATION)
-    df = upload_validator(df,column_names)
+    df = upload_validator(df, expected_upload_cols)
+    
+    # Feature Engineering (Vectorized)
+    df['u_g_color'] = df['u'] - df['g']
+    df['g_r_color'] = df['g'] - df['r']
+    df['r_i_color'] = df['r'] - df['i']
+    df['i_z_color'] = df['i'] - df['z']
+    
+    # Drop original bands
+    df = df.drop(columns=['u', 'g', 'r', 'i', 'z'])
+    
+    # Reorder columns to match the pipeline's expected order (excluding 'class')
+    model_features = [col for col in column_names.tolist() if col != "class"]
+    df = df[model_features]
 
     pred_label:list[float] = pipe.predict(df).tolist()
     pred_proba:list[list[float]] = pipe.predict_proba(df).tolist()
