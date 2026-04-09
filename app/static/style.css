@@ -1152,6 +1152,18 @@ input:focus ~ .input-focus-line {
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
+.batch-badge {
+    font-size: 0.85rem;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+    color: #fff;
+}
+
+.batch-galaxy { background: var(--galaxy); }
+.batch-star { background: var(--star); }
+.batch-qso { background: var(--qso); }
+
 .batch-table th {
     background: rgba(255, 255, 255, 0.05);
     color: var(--text-secondary);
@@ -1169,6 +1181,75 @@ input:focus ~ .input-focus-line {
     width: 100%;
     max-width: 200px;
     margin: 0 auto;
+}
+
+.batch-guidelines {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    background: rgba(68, 138, 255, 0.05);
+    border: 1px solid rgba(68, 138, 255, 0.2);
+    border-radius: 12px;
+}
+
+.guidelines-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+    color: var(--info);
+}
+
+.info-icon {
+    width: 18px;
+    height: 18px;
+}
+
+.guidelines-header h4 {
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.guideline-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.guideline-list li {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    line-height: 1.4;
+    padding-left: 1.2rem;
+    position: relative;
+}
+
+.guideline-list li::before {
+    content: '•';
+    position: absolute;
+    left: 0;
+    color: var(--info);
+}
+
+.guideline-list code {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 0.1rem 0.3rem;
+    border-radius: 4px;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--accent-secondary);
+}
+
+.guideline-warning {
+    color: #ff8a80 !important;
+    background: rgba(255, 82, 82, 0.05);
+    padding: 0.5rem 0.5rem 0.5rem 1.2rem !important;
+    border-radius: 6px;
+    margin-top: 0.25rem;
+}
+
+.guideline-warning::before {
+    display: none;
 }
 
 /* ========================================

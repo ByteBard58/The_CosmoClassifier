@@ -66,6 +66,14 @@ function initPredictForm() {
             const formData = new FormData(form);
             const dataObj = Object.fromEntries(formData.entries());
             
+            // Manual validation check to ensure no empty values
+            const requiredFields = ["ra", "dec", "redshift", "psfMag_r", "u", "g", "r", "i", "z"];
+            for (let field of requiredFields) {
+                if (dataObj[field] === undefined || dataObj[field] === "") {
+                    throw new Error("Please fill in all inputs before analyzing.");
+                }
+            }
+            
             // Convert numeric strings to numbers
             for (let key in dataObj) {
                 if (!isNaN(dataObj[key]) && dataObj[key] !== "") {
@@ -423,12 +431,12 @@ function initBatchPredictForm() {
         preds.forEach((pred, index) => {
             counts[pred] = (counts[pred] || 0) + 1;
             
-            const maxProb = Math.max(...probs[index]);
+            const maxProb = (Math.max(...probs[index]) * 100).toFixed(1);
             
             const tr = document.createElement("tr");
             tr.innerHTML = `
                 <td>Row ${index + 1}</td>
-                <td><span class="pred-class ${pred.toLowerCase()}" style="font-size: 0.85rem; padding: 2px 6px; border-radius: 4px; background: rgba(255,255,255,0.1);">${pred}</span></td>
+                <td><span class="batch-badge batch-${pred.toLowerCase()}">${pred}</span></td>
                 <td>${maxProb}%</td>
             `;
             tbody.appendChild(tr);

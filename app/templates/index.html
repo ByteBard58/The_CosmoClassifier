@@ -273,6 +273,23 @@
                             </button>
                         </div>
                     </form>
+
+                    <!-- Batch Guidelines -->
+                    <div class="batch-guidelines">
+                        <div class="guidelines-header">
+                            <svg viewBox="0 0 24 24" fill="none" class="info-icon" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="12" y1="16" x2="12" y2="12"></line>
+                                <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                            </svg>
+                            <h4>Dataset Format Guidelines</h4>
+                        </div>
+                        <ul class="guideline-list">
+                            <li><strong>Target Columns:</strong> <code>ra</code>, <code>dec</code>, <code>redshift</code>, <code>psfMag_r</code>, <code>u</code>, <code>g</code>, <code>r</code>, <code>i</code>, <code>z</code></li>
+                            <li><strong>Exact Headers:</strong> The CSV file must contain precisely these lowercase headers in the correct arrangement. All fields must be numeric.</li>
+                            <li class="guideline-warning"><strong>⚠️ Action Failure:</strong> Failing to format the columns correctly, including non-numeric artifacts, or submitting extraneous indices will immediately trigger a payload rejection and throw server-side errors, aborting the process.</li>
+                        </ul>
+                    </div>
                 </div>
                 
                 <!-- Right Panel: Batch Results -->
