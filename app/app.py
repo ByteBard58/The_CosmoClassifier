@@ -8,9 +8,7 @@ from sklearn.pipeline import Pipeline
 from models.fit import main
 from .schema.validation import UserInput
 from pathlib import Path
-from uuid import uuid4
 from contextlib import asynccontextmanager
-import shutil
 import numpy as np
 import pandas as pd
 import joblib
@@ -159,26 +157,18 @@ async def prediction_via_file_ops(payload:UploadFile, dep: Tuple[Pipeline,np.nda
     pipe, column_names = dep
     expected_upload_cols = ['ra', 'dec', 'redshift', 'psfMag_r', 'u', 'g', 'r', 'i', 'z']
 
-    ## Save the incoming .csv file on disk
     accepted_exts = [".csv"]
-    UPLOAD_DIR = Path("app","uploads")
-    UPLOAD_DIR.mkdir(exist_ok=True)
     extension = Path(payload.filename).suffix
-    if extension not in accepted_exts:
+    if extension.lower() not in accepted_exts:
         raise HTTPException(
             status_code=422, 
             detail=f"Uploaded data must be in '.csv' format, got {extension} instead"
         )
-    filename = f"{uuid4()}{extension}"
-    DESTINATION = UPLOAD_DIR / filename
 
     try:
-        with open(DESTINATION,"wb") as f:
-            shutil.copyfileobj(payload.file,f)
+        df = pd.read_csv(payload.file)
     except Exception as e:
-        return f"Error during payload dump procedure: {e}"
-
-    df = pd.read_csv(DESTINATION)
+        raise HTTPException(status_code=422, detail=f"Failed to parse CSV file tracking: {str(e)}")
     df = upload_validator(df, expected_upload_cols)
     
     # Feature Engineering (Vectorized)
@@ -186,8 +176,6 @@ async def prediction_via_file_ops(payload:UploadFile, dep: Tuple[Pipeline,np.nda
     df['g_r_color'] = df['g'] - df['r']
     df['r_i_color'] = df['r'] - df['i']
     df['i_z_color'] = df['i'] - df['z']
-    
-    # Drop original bands
     df = df.drop(columns=['u', 'g', 'r', 'i', 'z'])
     
     # Reorder columns to match the pipeline's expected order (excluding 'class')
