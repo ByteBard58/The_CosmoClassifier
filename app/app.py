@@ -200,7 +200,7 @@ async def prediction_via_file_ops(payload:UploadFile, dep: Tuple[Pipeline,np.nda
     # Postprocessing
     label_map = {0: "GALAXY", 1: "STAR", 2: "QSO"}
     pred_label:list[str] = [label_map.get(pred) for pred in pred_label]
-    pred_proba = [[round(r) for r in pred] for pred in pred_proba]
+    pred_proba = [[round(r, 3) for r in pred] for pred in pred_proba]
 
     msg = {
         "message": "batch prediction successful",
