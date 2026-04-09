@@ -1,4 +1,5 @@
-from fastapi import FastAPI, Depends, Request
+from pydantic import BaseModel
+from fastapi import FastAPI, Depends, Request, UploadFile
 from fastapi.responses import JSONResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.exceptions import RequestValidationError
@@ -12,6 +13,7 @@ import joblib
 import numpy as np
 import os
 
+# Helper for loading and self-healing the artifacts
 def load_or_create_models() -> Tuple[Pipeline,np.ndarray]:
     model_path = Path("models","estimator.pkl")
     columns_path = Path("models","column_names.pkl")
@@ -34,6 +36,18 @@ def load_or_create_models() -> Tuple[Pipeline,np.ndarray]:
         return pipe,column_names
     except Exception as e:
         raise RuntimeError(f"Artifacts could not be loaded: {e}")
+    
+def preprocess_data(value:BaseModel) -> dict:
+    # Preprocessing
+    value:dict = value.model_dump(mode="json")
+    kick = ["u","g","r","i","z"]
+    final_value = {key:val for key,val in value.items() if key not in kick}
+    final_value["u_g_color"] = safe_sub("u","g",value)
+    final_value["g_r_color"] = safe_sub("g","r",value)
+    final_value["r_i_color"] = safe_sub("r","i",value)
+    final_value["i_z_color"] = safe_sub("i","z",value)
+
+    return final_value
 
 @asynccontextmanager
 async def lifespan(app:FastAPI):
@@ -91,15 +105,7 @@ def home():
 def prediction_ops(value:UserInput, dep:Tuple[Pipeline,np.ndarray] = Depends(get_model)):
     pipe, column_names = dep
     column_names:List[str] = column_names.tolist()
-
-    # Preprocessing
-    value:dict = value.model_dump(mode="json")
-    kick = ["u","g","r","i","z"]
-    final_value = {key:val for key,val in value.items() if key not in kick}
-    final_value["u_g_color"] = safe_sub("u","g",value)
-    final_value["g_r_color"] = safe_sub("g","r",value)
-    final_value["r_i_color"] = safe_sub("r","i",value)
-    final_value["i_z_color"] = safe_sub("i","z",value)
+    final_value:dict = preprocess_data(value)
 
     # Order Check and running prediction
     final_res = []
@@ -127,3 +133,34 @@ def prediction_ops(value:UserInput, dep:Tuple[Pipeline,np.ndarray] = Depends(get
         status_code=201, content=msg
     )
 
+@app.post("/predict/file")
+def prediction_via_file_ops(value:UploadFile, dep: Tuple[Pipeline,np.ndarray] = Depends(get_model)):
+    pipe, column_names = dep
+    column_names:List[str] = column_names.tolist()
+    final_value:dict = preprocess_data(value)
+
+    # Order Check and running prediction
+    final_res = []
+    for col in column_names:
+        if col == "class":
+            continue
+        else:
+            final_res.append(final_value.get(col,None))
+    final_res = np.array(final_res).reshape(1,-1)
+
+    pred_label = int(pipe.predict(final_res))
+    pred_proba = pipe.predict_proba(final_res).tolist()
+
+    # Postprocessing
+    label_map = {0: "GALAXY", 1: "STAR", 2: "QSO"}
+    pred_label = label_map.get(pred_label)
+    pred_proba = {lmv:round(proba,3) for lmv,proba in zip(label_map.values(), pred_proba)}
+
+    msg = {
+        "message": "prediction successful",
+        "prediction": pred_label, 
+        "probabilities": pred_proba
+    }
+    return JSONResponse(
+        status_code=201, content=msg
+    )
